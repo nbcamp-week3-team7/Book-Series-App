@@ -25,6 +25,12 @@ struct Book: Codable {
     let wiki: String
     let chapters: [Chapter]
     
+    enum CodingKeys: String, CodingKey {
+        case title, author, pages
+        case releaseDate = "release_date"
+        case dedication, summary, wiki, chapters
+        
+    }
 }
 
 struct Chapter: Codable {

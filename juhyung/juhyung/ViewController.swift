@@ -53,7 +53,7 @@ class ViewController: UIViewController {
     private func configureUI() {
         titleLabel.textAlignment = .center
         titleLabel.font = .boldSystemFont(ofSize: 24)
-        titleLabel.text = "임시 텍스트"
+        titleLabel.numberOfLines = 2
         
         seriesOrderView.backgroundColor = .systemBlue
         seriesOrderView.clipsToBounds = true
