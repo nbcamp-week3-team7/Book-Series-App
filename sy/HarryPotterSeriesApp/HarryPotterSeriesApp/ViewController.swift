@@ -121,6 +121,48 @@ class ViewController: UIViewController {
         return label
     }()
     
+    let dedicationStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.spacing = 8
+        return sv
+    }()
+    
+    let dedicationTitleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 18, weight: .bold)
+        return label
+    }()
+    
+    let dedicationContentLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 14)
+        label.textColor = .gray
+        label.numberOfLines = 0
+        return label
+    }()
+    
+    let summaryStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.spacing = 8
+        return sv
+    }()
+    
+    let summaryTitleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 18, weight: .bold)
+        return label
+    }()
+    
+    let summaryContentLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 14)
+        label.textColor = .gray
+        label.numberOfLines = 0
+        return label
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -153,9 +195,14 @@ class ViewController: UIViewController {
         publishDateValueLabel.text = books[0].releaseDate
         pageCountTitleLabel.text = "Pages"
         pageCountValueLabel.text = "\(books[0].pages)"
+        dedicationTitleLabel.text = "Dedication"
+        dedicationContentLabel.text = books[0].dedication
+        summaryTitleLabel.text = "Summary"
+        summaryContentLabel.text = books[0].summary
+        
         setupbookInfoStackView()
         
-        [mainTitleLabel, seriesButton, bookInfoStackView]
+        [mainTitleLabel, seriesButton, bookInfoStackView, dedicationStackView, summaryStackView]
             .forEach { view.addSubview($0) }
         
         mainTitleLabel.snp.makeConstraints {
@@ -180,6 +227,18 @@ class ViewController: UIViewController {
             $0.width.equalTo(100)
             $0.height.equalTo(bookImageView.snp.width).multipliedBy(1.5)
         }
+        
+        dedicationStackView.snp.makeConstraints {
+            $0.top.equalTo(bookInfoStackView.snp.bottom).offset(24)
+            $0.leading.equalToSuperview().offset(8)
+            $0.trailing.equalToSuperview().offset(-8)
+        }
+        
+        summaryStackView.snp.makeConstraints {
+            $0.top.equalTo(dedicationStackView.snp.bottom).offset(24)
+            $0.leading.equalToSuperview().offset(8)
+            $0.trailing.equalToSuperview().offset(-8)
+        }
     }
     
     func setupbookInfoStackView() {
@@ -197,6 +256,12 @@ class ViewController: UIViewController {
         
         [bookImageView, bookDetailStackView]
             .forEach { bookInfoStackView.addArrangedSubview($0) }
+        
+        [dedicationTitleLabel, dedicationContentLabel]
+            .forEach { dedicationStackView.addArrangedSubview($0) }
+        
+        [summaryTitleLabel, summaryContentLabel]
+            .forEach { summaryStackView.addArrangedSubview($0) }
     }
 }
 
