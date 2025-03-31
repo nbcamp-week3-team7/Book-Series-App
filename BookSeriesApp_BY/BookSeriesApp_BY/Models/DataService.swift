@@ -4,25 +4,6 @@
 
 import Foundation
 
-// ==== Book 모델 정의를 위한 구조체 생성 =====
-struct Book: Decodable {
-    let title: String
-    let author: String
-    let pages: Int
-    let release_date: String
-    let dedication: String
-    let summary: String
-}
-
-// ===== JSON 디코딩을 위한 모델 =====
-struct BookResponse: Decodable {
-    let data: [BookData]
-}
-
-struct BookData: Decodable {
-    let attributes: Book
-}
-
 class DataService {
     
     enum DataError: Error {
