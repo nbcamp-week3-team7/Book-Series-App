@@ -31,6 +31,15 @@ class ViewController: UIViewController {
         return button
     }()
     
+    let scrollView = UIScrollView()
+    
+    let contentStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.spacing = 24
+        return sv
+    }()
+    
     let bookInfoStackView: UIStackView = {
         let sv = UIStackView()
         sv.axis = .horizontal
@@ -163,13 +172,17 @@ class ViewController: UIViewController {
         return label
     }()
     
-    let scrollView = UIScrollView()
-    
-    let contentStackView: UIStackView = {
+    let chapterStackView: UIStackView = {
         let sv = UIStackView()
         sv.axis = .vertical
-        sv.spacing = 24
+        sv.spacing = 8
         return sv
+    }()
+    
+    let chapterTitleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 18, weight: .bold)
+        return label
     }()
     
     override func viewDidLoad() {
@@ -208,6 +221,8 @@ class ViewController: UIViewController {
         dedicationContentLabel.text = books[0].dedication
         summaryTitleLabel.text = "Summary"
         summaryContentLabel.text = books[0].summary
+        chapterTitleLabel.text = "Chapters"
+        addChapters()
         
         setupbookInfoStackView()
         
@@ -216,7 +231,7 @@ class ViewController: UIViewController {
         
         scrollView.addSubview(contentStackView)
         
-        [bookInfoStackView, dedicationStackView, summaryStackView]
+        [bookInfoStackView, dedicationStackView, summaryStackView, chapterStackView]
             .forEach { contentStackView.addArrangedSubview($0) }
         
         mainTitleLabel.snp.makeConstraints {
@@ -263,6 +278,10 @@ class ViewController: UIViewController {
             $0.leading.equalToSuperview().offset(8)
             $0.trailing.equalToSuperview().offset(-8)
         }
+        
+        chapterStackView.snp.makeConstraints {
+            $0.top.equalTo(summaryStackView.snp.bottom).offset(24)
+        }
     }
     
     func setupbookInfoStackView() {
@@ -286,6 +305,26 @@ class ViewController: UIViewController {
         
         [summaryTitleLabel, summaryContentLabel]
             .forEach { summaryStackView.addArrangedSubview($0) }
+    }
+    
+    func addChapters() {
+        chapterStackView.addArrangedSubview(chapterTitleLabel)
+        
+        var chapterLabels = Array<UILabel>()
+        
+        books[0].chapters.forEach {
+            let label = UILabel()
+            label.font = .systemFont(ofSize: 14)
+            label.textColor = .gray
+            label.numberOfLines = 0
+            label.text = $0.title
+            
+            chapterLabels.append(label)
+        }
+        
+        chapterLabels.forEach {
+            chapterStackView.addArrangedSubview($0)
+        }
     }
 }
 
