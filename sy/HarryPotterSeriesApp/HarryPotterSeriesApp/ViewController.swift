@@ -163,6 +163,15 @@ class ViewController: UIViewController {
         return label
     }()
     
+    let scrollView = UIScrollView()
+    
+    let contentStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.spacing = 24
+        return sv
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -202,8 +211,13 @@ class ViewController: UIViewController {
         
         setupbookInfoStackView()
         
-        [mainTitleLabel, seriesButton, bookInfoStackView, dedicationStackView, summaryStackView]
+        [mainTitleLabel, seriesButton, scrollView]
             .forEach { view.addSubview($0) }
+        
+        scrollView.addSubview(contentStackView)
+        
+        [bookInfoStackView, dedicationStackView, summaryStackView]
+            .forEach { contentStackView.addArrangedSubview($0) }
         
         mainTitleLabel.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).offset(10)
@@ -217,8 +231,18 @@ class ViewController: UIViewController {
             $0.centerX.equalToSuperview()
         }
         
+        scrollView.snp.makeConstraints {
+            $0.top.equalTo(seriesButton.snp.bottom).offset(16)
+            $0.leading.trailing.bottom.equalToSuperview()
+        }
+        
+        contentStackView.snp.makeConstraints {
+            $0.edges.equalTo(scrollView.contentLayoutGuide)
+            $0.width.equalTo(scrollView.frameLayoutGuide)
+        }
+        
         bookInfoStackView.snp.makeConstraints {
-            $0.top.equalTo(seriesButton.snp.bottom).offset(24)
+            $0.top.equalTo(contentStackView.snp.top)
             $0.leading.equalToSuperview().offset(8)
             $0.trailing.equalToSuperview().offset(-8)
         }
