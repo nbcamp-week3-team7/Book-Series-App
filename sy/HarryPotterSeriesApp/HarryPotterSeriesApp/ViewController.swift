@@ -193,6 +193,8 @@ class ViewController: UIViewController {
     
     private var isExpanded: Bool = false
     
+    private var selectedBook: Book?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -200,6 +202,7 @@ class ViewController: UIViewController {
         isExpanded = UserDefaults.standard.bool(forKey: "isExpanded")
         
         loadBooks()
+        selectedBook = books[0]
         configureUI()
     }
     
@@ -217,22 +220,7 @@ class ViewController: UIViewController {
     }
     
     func configureUI() {
-        mainTitleLabel.text = books[0].title
-        bookImageView.image = #imageLiteral(resourceName: "harrypotter1")
-        titleLabel.text = books[0].title
-        authorTitleLabel.text = "Author"
-        authorValueLabel.text = books[0].author
-        publishDateTitleLabel.text = "Released"
-        publishDateValueLabel.text = books[0].releaseDate
-        pageCountTitleLabel.text = "Pages"
-        pageCountValueLabel.text = "\(books[0].pages)"
-        dedicationTitleLabel.text = "Dedication"
-        dedicationContentLabel.text = books[0].dedication
-        summaryTitleLabel.text = "Summary"
-        summaryContentLabel.text = books[0].summary
-        chapterTitleLabel.text = "Chapters"
-        
-        addChapters()
+        updateBookDetailView()
         setupbookInfoStackView()
         updateLabelWithReadMore()
         
@@ -319,12 +307,12 @@ class ViewController: UIViewController {
             .forEach { summaryStackView.addArrangedSubview($0) }
     }
     
-    func addChapters() {
+    func addChapters(_ selectedBook: Book) {
         chapterStackView.addArrangedSubview(chapterTitleLabel)
         
         var chapterLabels = Array<UILabel>()
         
-        books[0].chapters.forEach {
+        selectedBook.chapters.forEach {
             let label = UILabel()
             label.font = .systemFont(ofSize: 14)
             label.textColor = .gray
@@ -376,16 +364,46 @@ class ViewController: UIViewController {
             button.setTitle("\(i + 1)", for: .normal)
             button.contentHorizontalAlignment = .center
             button.titleLabel?.font = .systemFont(ofSize: 16)
-            button.titleLabel?.textColor = .white
-            button.backgroundColor = .systemBlue
+            button.setTitleColor(.systemBlue, for: .normal)
+            button.backgroundColor = .systemGray5
             button.layer.cornerRadius = 20
             button.clipsToBounds = true
+            button.addTarget(self, action: #selector(seriesButtonTapped), for: .touchUpInside)
             button.snp.makeConstraints {
                 $0.width.height.equalTo(40)
             }
             
             buttonStackView.addArrangedSubview(button)
         }
+    }
+    
+    @objc func seriesButtonTapped(_ sender: UIButton) {
+        guard let title = sender.title(for: .normal) else { return }
+        selectedBook = books[Int(title)! - 1]
+        updateBookDetailView()
+    }
+    
+    func updateBookDetailView() {
+        guard let unwrappedSelectedBook = selectedBook else { return }
+        
+        mainTitleLabel.text = unwrappedSelectedBook.title
+        bookImageView.image = #imageLiteral(resourceName: "harrypotter1")
+        titleLabel.text = unwrappedSelectedBook.title
+        authorTitleLabel.text = "Author"
+        authorValueLabel.text = unwrappedSelectedBook.author
+        publishDateTitleLabel.text = "Released"
+        publishDateValueLabel.text = unwrappedSelectedBook.releaseDate
+        pageCountTitleLabel.text = "Pages"
+        pageCountValueLabel.text = "\(unwrappedSelectedBook.pages)"
+        dedicationTitleLabel.text = "Dedication"
+        dedicationContentLabel.text = unwrappedSelectedBook.dedication
+        summaryTitleLabel.text = "Summary"
+        summaryContentLabel.text = unwrappedSelectedBook.summary
+        chapterTitleLabel.text = "Chapters"
+        
+        chapterStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        
+        addChapters(unwrappedSelectedBook)
     }
 }
 
