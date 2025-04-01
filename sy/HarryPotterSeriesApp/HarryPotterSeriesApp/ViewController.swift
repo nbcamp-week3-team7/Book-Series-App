@@ -200,6 +200,8 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         
+        isExpanded = UserDefaults.standard.bool(forKey: "isExpanded")
+        
         loadBooks()
         configureUI()
     }
@@ -341,12 +343,18 @@ class ViewController: UIViewController {
     
     func updateLabelWithReadMore() {
         guard let count = summaryContentLabel.text?.count else { return }
-        if count >= 450 {            
+        if count >= 450 {
             readMoreToggleButton.addTarget(self, action: #selector(toggleSummaryText), for: .touchUpInside)
             summaryStackView.addArrangedSubview(readMoreToggleButton)
             
-            summaryContentLabel.lineBreakMode = .byTruncatingTail
-            summaryContentLabel.numberOfLines = 7
+            if isExpanded {
+                summaryContentLabel.numberOfLines = 0
+                readMoreToggleButton.setTitle("접기", for: .normal)
+            } else {
+                summaryContentLabel.numberOfLines = 7
+                summaryContentLabel.lineBreakMode = .byTruncatingTail
+                readMoreToggleButton.setTitle("더 보기", for: .normal)
+            }
         }
     }
     
@@ -360,6 +368,8 @@ class ViewController: UIViewController {
             summaryContentLabel.numberOfLines = 7
             readMoreToggleButton.setTitle("더 보기", for: .normal)
         }
+        
+        UserDefaults.standard.set(isExpanded, forKey: "isExpanded")
     }
 }
 
