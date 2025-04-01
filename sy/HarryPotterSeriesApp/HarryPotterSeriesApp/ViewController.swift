@@ -179,11 +179,22 @@ class ViewController: UIViewController {
         return sv
     }()
     
+    let readMoreToggleButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("더 보기", for: .normal)
+        button.setTitleColor(.link, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 14)
+        button.contentHorizontalAlignment = .right
+        return button
+    }()
+    
     let chapterTitleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 18, weight: .bold)
         return label
     }()
+    
+    private var isExpanded: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -222,9 +233,10 @@ class ViewController: UIViewController {
         summaryTitleLabel.text = "Summary"
         summaryContentLabel.text = books[0].summary
         chapterTitleLabel.text = "Chapters"
-        addChapters()
         
+        addChapters()
         setupbookInfoStackView()
+        updateLabelWithReadMore()
         
         [mainTitleLabel, seriesButton, scrollView]
             .forEach { view.addSubview($0) }
@@ -324,6 +336,29 @@ class ViewController: UIViewController {
         
         chapterLabels.forEach {
             chapterStackView.addArrangedSubview($0)
+        }
+    }
+    
+    func updateLabelWithReadMore() {
+        guard let count = summaryContentLabel.text?.count else { return }
+        if count >= 450 {            
+            readMoreToggleButton.addTarget(self, action: #selector(toggleSummaryText), for: .touchUpInside)
+            summaryStackView.addArrangedSubview(readMoreToggleButton)
+            
+            summaryContentLabel.lineBreakMode = .byTruncatingTail
+            summaryContentLabel.numberOfLines = 7
+        }
+    }
+    
+    @objc func toggleSummaryText() {
+        isExpanded.toggle()
+        
+        if isExpanded {
+            summaryContentLabel.numberOfLines = 0
+            readMoreToggleButton.setTitle("접기", for: .normal)
+        } else {
+            summaryContentLabel.numberOfLines = 7
+            readMoreToggleButton.setTitle("더 보기", for: .normal)
         }
     }
 }
