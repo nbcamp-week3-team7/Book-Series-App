@@ -195,11 +195,14 @@ class ViewController: UIViewController {
     
     private var selectedBook: Book?
     
+    private var prevTitleNum: Int?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         
         isExpanded = UserDefaults.standard.bool(forKey: "isExpanded")
+        prevTitleNum = 1
         
         loadBooks()
         selectedBook = books[0]
@@ -364,8 +367,13 @@ class ViewController: UIViewController {
             button.setTitle("\(i + 1)", for: .normal)
             button.contentHorizontalAlignment = .center
             button.titleLabel?.font = .systemFont(ofSize: 16)
-            button.setTitleColor(.systemBlue, for: .normal)
-            button.backgroundColor = .systemGray5
+            if i == 0 {
+                button.setTitleColor(.white, for: .normal)
+                button.backgroundColor = .systemBlue
+            } else {
+                button.setTitleColor(.systemBlue, for: .normal)
+                button.backgroundColor = .systemGray5
+            }
             button.layer.cornerRadius = 20
             button.clipsToBounds = true
             button.addTarget(self, action: #selector(seriesButtonTapped), for: .touchUpInside)
@@ -378,8 +386,25 @@ class ViewController: UIViewController {
     }
     
     @objc func seriesButtonTapped(_ sender: UIButton) {
-        guard let title = sender.title(for: .normal) else { return }
-        selectedBook = books[Int(title)! - 1]
+        guard let title = sender.title(for: .normal),
+              let titleNum = Int(title) else { return }
+        
+        if titleNum == prevTitleNum {
+            return
+        }
+        
+        selectedBook = books[titleNum - 1]
+        
+        sender.backgroundColor = .systemBlue
+        sender.setTitleColor(.white, for: .normal)
+
+        if let prev = prevTitleNum,
+           let prevButton = buttonStackView.arrangedSubviews[prev - 1] as? UIButton {
+            prevButton.backgroundColor = .systemGray5
+            prevButton.setTitleColor(.systemBlue, for: .normal)
+        }
+        
+        prevTitleNum = titleNum
         updateBookDetailView()
     }
     
