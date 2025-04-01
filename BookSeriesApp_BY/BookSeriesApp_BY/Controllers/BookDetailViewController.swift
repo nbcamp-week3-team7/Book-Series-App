@@ -1,8 +1,3 @@
-//
-// 25.03.31.(월) 로직 구현
-// ===== LV 2. UIStackView 구현 =====
-// ===== LV 3. Dedication, Summary 구성 =====
-
 import UIKit
 import SnapKit
 
@@ -29,7 +24,11 @@ class BookDetailViewController: UIViewController {
     var dedicationLabel = UILabel()
     let summaryTitleLabel = UILabel()
     var summaryLabel = UILabel()
-
+    
+    // ===== LV4. UI 요소들 선언 =====
+    var chaptersTitleLabel = UILabel()
+    var previousLabel: UILabel? = nil
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -51,7 +50,18 @@ class BookDetailViewController: UIViewController {
     }
     
     func setupUI() {
-        // ===== 기본 타이틀 라벨 설정 =====
+        // ===== 기본 설정 =====
+        view.backgroundColor = .white
+        
+        // ===== 스크롤뷰 추가 =====
+        let scrollView = UIScrollView()
+        scrollView.showsVerticalScrollIndicator = false // 세로 스크롤 바 숨기기
+        scrollView.showsHorizontalScrollIndicator = false // 가로 스크롤 바 숨기기
+        view.addSubview(scrollView)
+        
+        // ===== 스크롤뷰 안에 스택뷰 추가 =====
+        scrollView.addSubview(stackView)
+        
         titleLabel.textColor = .black
         titleLabel.font = .boldSystemFont(ofSize: 20)
         titleLabel.numberOfLines = 0
@@ -63,7 +73,8 @@ class BookDetailViewController: UIViewController {
         configureTitleLabel(pagesTitleLabel, fontSize: 14, textColor: .black, text: "Pages")
         configureTitleLabel(dedicationTitleLabel, fontSize: 18, textColor: .black, text: "Dedication")
         configureTitleLabel(summaryTitleLabel, fontSize: 18, textColor: .black, text: "Summary")
-            
+        configureTitleLabel(chaptersTitleLabel, fontSize: 18, textColor: .black, text: "Chapters")
+        
         // ===== 밸류 라벨들 설정 =====
         configureValueLabel(authorLabel, fontSize: 18, textColor: .darkGray)
         configureValueLabel(releaseDateLabel, fontSize: 14, textColor: .gray)
@@ -94,26 +105,39 @@ class BookDetailViewController: UIViewController {
         verticalLabelsStackView.spacing = 8
         verticalLabelsStackView.alignment = .leading
         
-        // ===== 각 책 정보를 가로 스택뷰로 묶기 =====
-        let authorRow = createRowStackView(titleLabel: authorTitleLabel, valueLabel: authorLabel)
-        let releaseRow = createRowStackView(titleLabel: releaseTitleLabel, valueLabel: releaseDateLabel)
-        let pagesRow = createRowStackView(titleLabel: pagesTitleLabel, valueLabel: pagesLabel)
-        
         // ===== 세로 스택뷰에 요소 추가 =====
         verticalLabelsStackView.addArrangedSubview(titleLabel)
-        verticalLabelsStackView.addArrangedSubview(authorRow)
-        verticalLabelsStackView.addArrangedSubview(releaseRow)
-        verticalLabelsStackView.addArrangedSubview(pagesRow)
+        verticalLabelsStackView.addArrangedSubview(createRowStackView(titleLabel: authorTitleLabel, valueLabel: authorLabel))
+        verticalLabelsStackView.addArrangedSubview(createRowStackView(titleLabel: releaseTitleLabel, valueLabel: releaseDateLabel))
+        verticalLabelsStackView.addArrangedSubview(createRowStackView(titleLabel: pagesTitleLabel, valueLabel: pagesLabel))
         
-        // ===== 가로 스택뷰에 이미지와 세로 라벨 추가 =====
         horizontalStackView.addArrangedSubview(coverImageView)
         horizontalStackView.addArrangedSubview(verticalLabelsStackView)
         
-        // ===== 최종 스택뷰에 가로 스택뷰 추가 =====
-        stackView.addArrangedSubview(horizontalStackView)
+        [horizontalStackView, dedicationTitleLabel, dedicationLabel, summaryTitleLabel, summaryLabel, chaptersTitleLabel].forEach { stackView.addArrangedSubview ($0) }
         
-        // ===== 스택뷰, 라벨 화면에 추가 =====
-        [stackView, dedicationTitleLabel, dedicationLabel, summaryTitleLabel, summaryLabel].forEach { view.addSubview($0) }
+        // ===== LV 4. 목차 라벨 추가 =====
+        for chapter in book!.chapters {
+            let chapterLabel = UILabel() // 새로운 UILabel 인스턴스를 생성
+            chapterLabel.text = chapter.title
+            chapterLabel.font = .systemFont(ofSize: 14)
+            chapterLabel.textColor = .darkGray
+            chapterLabel.numberOfLines = 0
+            chapterLabel.lineBreakMode = .byWordWrapping
+            
+            // 스택뷰에 라벨 추가
+            stackView.addArrangedSubview(chapterLabel)
+        }
+        
+        // ===== 레이아웃 설정 =====
+        scrollView.snp.makeConstraints {
+            $0.edges.equalTo(view.safeAreaLayoutGuide) // 스크롤뷰가 화면 전체를 덮도록 설정
+        }
+        
+        stackView.snp.makeConstraints {
+            $0.edges.equalTo(scrollView.contentLayoutGuide) // 스크롤뷰 콘텐츠 크기에 맞게 설정
+            $0.width.equalTo(scrollView.frameLayoutGuide) // 가로 크기를 스크롤뷰에 맞춤
+        }
     }
     
     // ===== 가로 스택뷰 생성 함수 =====
@@ -121,59 +145,24 @@ class BookDetailViewController: UIViewController {
         let rowStackView = UIStackView()
         rowStackView.axis = .horizontal
         rowStackView.alignment = .center
-
+        
         rowStackView.addArrangedSubview(titleLabel)
         rowStackView.addArrangedSubview(valueLabel)
         titleLabel.snp.makeConstraints {
-            $0.trailing.equalTo(valueLabel.snp.leading).offset(-10) // ===== 간격 설정 =====
+            $0.trailing.equalTo(valueLabel.snp.leading).offset(-10)
         }
         return rowStackView
     }
-
+    
     func setupLayout() {
-        // ===== 최종 스택뷰 레이아웃 설정 =====
-        stackView.snp.makeConstraints {
-            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(5)
-        }
-        
         // ===== 이미지뷰 크기 설정 =====
         coverImageView.snp.makeConstraints {
             $0.width.equalTo(100)
             $0.height.equalTo(150)
         }
-        
-        // ===== 가로 스택뷰 위치 설정 =====
-        horizontalStackView.snp.makeConstraints {
-            $0.leading.equalTo(stackView.snp.leading).inset(10)
-        }
-        
-        // ===== LV 3. Dedication 오토레이아웃 설정 =====
-        dedicationTitleLabel.snp.makeConstraints {
-            $0.top.equalTo(stackView.snp.bottom).offset(24)
-            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
-        }
-        
-        dedicationLabel.snp.makeConstraints {
-            $0.top.equalTo(dedicationTitleLabel.snp.bottom).offset(8)
-            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
-        }
-        
-        summaryTitleLabel.snp.makeConstraints {
-            $0.top.equalTo(dedicationLabel.snp.bottom).offset(24)
-            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
-        }
-        
-        summaryLabel.snp.makeConstraints {
-            $0.top.equalTo(summaryTitleLabel.snp.bottom).offset(8)
-            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
-        }
-        
-        
-        // ===== LV 3. Summary 오토레이아웃 설정 =====
     }
-
+    
     func configureData() {
-        // ===== 전달받은 데이터로 UI 구성 =====
         guard let book = book else { return }
         
         coverImageView.image = UIImage(named: "harrypotter1") ?? UIImage(named: "defaultImage")
@@ -182,13 +171,11 @@ class BookDetailViewController: UIViewController {
         releaseDateLabel.text = formatDate(book.release_date)
         pagesLabel.text = "\(book.pages)"
         
-        // ===== LV 3. 데이터 출력 =====
         dedicationLabel.text = book.dedication
         summaryLabel.text = book.summary
     }
-
+    
     func formatDate(_ date: String) -> String {
-        // ===== 날짜 포맷 변환 함수 =====
         let inputFormatter = DateFormatter()
         inputFormatter.dateFormat = "yyyy-MM-dd"
         

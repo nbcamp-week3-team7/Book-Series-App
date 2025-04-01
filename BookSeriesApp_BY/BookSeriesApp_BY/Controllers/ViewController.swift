@@ -31,9 +31,10 @@ class ViewController: UIViewController {
             case .success(let books):
                 if let firstBook = books.first {
                     self.book = firstBook
-                    self.bookTitleLabel.text = firstBook.title // UI 업데이트
+                    self.bookTitleLabel.text = firstBook.title
+                    self.addBookDetailViewController() // 데이터 로드 후 호출
                 } else {
-                    self.bookTitleLabel.text = "No books available" // 기본 메시지
+                    self.bookTitleLabel.text = "No books available"
                 }
             case .failure(let error):
                 self.showErrorAlert(message: error.localizedDescription)
@@ -84,23 +85,24 @@ class ViewController: UIViewController {
         }
     }
     
-    // ===== LV 2. BookDetailViewController 추가 =====
-        private func addBookDetailViewController() {
-            let detailVC = BookDetailViewController()
-            detailVC.book = self.book // 데이터 전달
+    // ===== LV 2~4 BookDetailViewController 연결 =====
+    private func addBookDetailViewController() {
+        let detailVC = BookDetailViewController()
+        detailVC.book = self.book // 데이터 전달
+        
+        print("Book Data: \(detailVC.book?.title ?? "No data")") // 데이터 확인
 
-            // ===== BookDetailViewController를 자식 뷰 컨트롤러로 추가 =====
-            addChild(detailVC)
-            view.addSubview(detailVC.view)
+        addChild(detailVC)
+        view.addSubview(detailVC.view)
 
-            // ===== BookDetailViewController의 뷰 레이아웃 설정 =====
-            detailVC.view.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate([
-                detailVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                detailVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                detailVC.view.topAnchor.constraint(equalTo: bookNumberLabel.bottomAnchor, constant: 30)
-            ])
+        detailVC.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            detailVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            detailVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            detailVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            detailVC.view.topAnchor.constraint(equalTo: bookNumberLabel.bottomAnchor)
+        ])
 
-            detailVC.didMove(toParent: self) // 자식 뷰 컨트롤러로 등록 완료
-        }
+        detailVC.didMove(toParent: self)
+    }
 }
