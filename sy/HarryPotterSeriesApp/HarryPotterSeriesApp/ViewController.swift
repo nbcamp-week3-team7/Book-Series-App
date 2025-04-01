@@ -20,15 +20,12 @@ class ViewController: UIViewController {
         return label
     }()
     
-    let seriesButton: UIButton = {
-        let button = UIButton()
-        button.contentHorizontalAlignment = .center
-        button.titleLabel?.font = .systemFont(ofSize: 16)
-        button.titleLabel?.textColor = .white
-        button.backgroundColor = .systemBlue
-        button.layer.cornerRadius = 20
-        button.clipsToBounds = true
-        return button
+    let buttonStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .horizontal
+        sv.spacing = 8
+        sv.distribution = .equalSpacing
+        return sv
     }()
     
     let scrollView = UIScrollView()
@@ -221,7 +218,6 @@ class ViewController: UIViewController {
     
     func configureUI() {
         mainTitleLabel.text = books[0].title
-        seriesButton.setTitle("1", for: .normal)
         bookImageView.image = #imageLiteral(resourceName: "harrypotter1")
         titleLabel.text = books[0].title
         authorTitleLabel.text = "Author"
@@ -240,8 +236,10 @@ class ViewController: UIViewController {
         setupbookInfoStackView()
         updateLabelWithReadMore()
         
-        [mainTitleLabel, seriesButton, scrollView]
+        [mainTitleLabel, buttonStackView, scrollView]
             .forEach { view.addSubview($0) }
+        
+        addSeriesButtons()
         
         scrollView.addSubview(contentStackView)
         
@@ -254,14 +252,14 @@ class ViewController: UIViewController {
             $0.trailing.equalToSuperview().offset(-20)
         }
         
-        seriesButton.snp.makeConstraints {
-            $0.width.height.equalTo(40)
+        buttonStackView.snp.makeConstraints {
             $0.top.equalTo(mainTitleLabel.snp.bottom).offset(16)
-            $0.centerX.equalToSuperview()
+            $0.leading.equalToSuperview().offset(20)
+            $0.trailing.equalToSuperview().offset(-20)
         }
         
         scrollView.snp.makeConstraints {
-            $0.top.equalTo(seriesButton.snp.bottom).offset(16)
+            $0.top.equalTo(buttonStackView.snp.bottom).offset(16)
             $0.leading.trailing.bottom.equalToSuperview()
         }
         
@@ -370,6 +368,24 @@ class ViewController: UIViewController {
         }
         
         UserDefaults.standard.set(isExpanded, forKey: "isExpanded")
+    }
+    
+    func addSeriesButtons() {
+        for i in 0..<books.count {
+            let button = UIButton()
+            button.setTitle("\(i + 1)", for: .normal)
+            button.contentHorizontalAlignment = .center
+            button.titleLabel?.font = .systemFont(ofSize: 16)
+            button.titleLabel?.textColor = .white
+            button.backgroundColor = .systemBlue
+            button.layer.cornerRadius = 20
+            button.clipsToBounds = true
+            button.snp.makeConstraints {
+                $0.width.height.equalTo(40)
+            }
+            
+            buttonStackView.addArrangedSubview(button)
+        }
     }
 }
 
