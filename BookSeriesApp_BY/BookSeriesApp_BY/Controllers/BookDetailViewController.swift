@@ -26,6 +26,7 @@ class BookDetailViewController: UIViewController {
     var summaryLabel = UILabel()
     
     // ===== LV4. UI 요소들 선언 =====
+    let scrollView = UIScrollView()
     var chaptersTitleLabel = UILabel()
     var previousLabel: UILabel? = nil
     
@@ -52,9 +53,11 @@ class BookDetailViewController: UIViewController {
     func setupUI() {
         // ===== 기본 설정 =====
         view.backgroundColor = .white
+        //stackView.backgroundColor = .blue
+        //scrollView.backgroundColor = .yellow
+
         
         // ===== 스크롤뷰 추가 =====
-        let scrollView = UIScrollView()
         scrollView.showsVerticalScrollIndicator = false // 세로 스크롤 바 숨기기
         scrollView.showsHorizontalScrollIndicator = false // 가로 스크롤 바 숨기기
         view.addSubview(scrollView)
@@ -128,16 +131,6 @@ class BookDetailViewController: UIViewController {
             // 스택뷰에 라벨 추가
             stackView.addArrangedSubview(chapterLabel)
         }
-        
-        // ===== 레이아웃 설정 =====
-        scrollView.snp.makeConstraints {
-            $0.edges.equalTo(view.safeAreaLayoutGuide) // 스크롤뷰가 화면 전체를 덮도록 설정
-        }
-        
-        stackView.snp.makeConstraints {
-            $0.edges.equalTo(scrollView.contentLayoutGuide) // 스크롤뷰 콘텐츠 크기에 맞게 설정
-            $0.width.equalTo(scrollView.frameLayoutGuide) // 가로 크기를 스크롤뷰에 맞춤
-        }
     }
     
     // ===== 가로 스택뷰 생성 함수 =====
@@ -160,6 +153,22 @@ class BookDetailViewController: UIViewController {
             $0.width.equalTo(100)
             $0.height.equalTo(150)
         }
+        
+        // ===== 레이아웃 설정 =====
+        scrollView.snp.makeConstraints {
+            $0.edges.equalTo(view.safeAreaLayoutGuide) // 스크롤뷰가 화면 전체를 덮도록 설정
+            $0.top.equalToSuperview().offset(20)
+        }
+        
+        stackView.snp.makeConstraints {
+            $0.edges.equalTo(scrollView.contentLayoutGuide) // 스크롤뷰 콘텐츠 크기에 맞게 설정
+            $0.width.equalTo(scrollView.frameLayoutGuide) // 가로 크기를 스크롤뷰에 맞춤
+            }
+        
+        // ===== 타이틀 라벨 3개 24만큼 간격 설정 =====
+        stackView.setCustomSpacing(24, after: summaryLabel)
+        stackView.setCustomSpacing(24, after: dedicationLabel)
+        stackView.setCustomSpacing(24, after: horizontalStackView)
     }
     
     func configureData() {

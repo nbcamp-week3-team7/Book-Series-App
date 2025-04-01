@@ -97,8 +97,8 @@ class ViewController: UIViewController {
 
         detailVC.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            detailVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            detailVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            detailVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            detailVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             detailVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             detailVC.view.topAnchor.constraint(equalTo: bookNumberLabel.bottomAnchor)
         ])
