@@ -1,6 +1,7 @@
 //
 // 25.03.31.(월) 로직 구현
 // ===== LV 2. UIStackView 구현 =====
+// ===== LV 3. Dedication, Summary 구성 =====
 
 import UIKit
 import SnapKit
@@ -10,7 +11,7 @@ class BookDetailViewController: UIViewController {
     // ===== 전달받을 책 데이터 =====
     var book: Book?
     
-    // ===== UI 요소들 선언 =====
+    // ===== LV2. UI 요소들 선언 =====
     let stackView = UIStackView()
     let horizontalStackView = UIStackView()
     let verticalLabelsStackView = UIStackView()
@@ -22,6 +23,12 @@ class BookDetailViewController: UIViewController {
     let releaseDateLabel = UILabel()
     let pagesTitleLabel = UILabel()
     let pagesLabel = UILabel()
+    
+    // ===== LV3. UI 요소들 선언 =====
+    let dedicationTitleLabel = UILabel()
+    var dedicationLabel = UILabel()
+    let summaryTitleLabel = UILabel()
+    var summaryLabel = UILabel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,12 +61,22 @@ class BookDetailViewController: UIViewController {
         configureTitleLabel(authorTitleLabel, fontSize: 16, textColor: .black, text: "Author")
         configureTitleLabel(releaseTitleLabel, fontSize: 14, textColor: .black, text: "Released")
         configureTitleLabel(pagesTitleLabel, fontSize: 14, textColor: .black, text: "Pages")
+        configureTitleLabel(dedicationTitleLabel, fontSize: 18, textColor: .black, text: "Dedication")
+        configureTitleLabel(summaryTitleLabel, fontSize: 18, textColor: .black, text: "Summary")
             
         // ===== 밸류 라벨들 설정 =====
         configureValueLabel(authorLabel, fontSize: 18, textColor: .darkGray)
-        authorLabel.font = .boldSystemFont(ofSize: 18)
         configureValueLabel(releaseDateLabel, fontSize: 14, textColor: .gray)
         configureValueLabel(pagesLabel, fontSize: 14, textColor: .gray)
+        configureValueLabel(dedicationLabel, fontSize: 14, textColor: .darkGray)
+        configureValueLabel(summaryLabel, fontSize: 14, textColor: .darkGray)
+        
+        // ===== 밸류 라벨 추가 설정 =====
+        authorLabel.font = .boldSystemFont(ofSize: 18)
+        dedicationLabel.numberOfLines = 0
+        dedicationLabel.lineBreakMode = .byWordWrapping
+        summaryLabel.numberOfLines = 0
+        summaryLabel.lineBreakMode = .byTruncatingHead
         
         // ===== StackView 기본 속성 설정 =====
         stackView.axis = .vertical
@@ -95,7 +112,8 @@ class BookDetailViewController: UIViewController {
         // ===== 최종 스택뷰에 가로 스택뷰 추가 =====
         stackView.addArrangedSubview(horizontalStackView)
         
-        view.addSubview(stackView) // ===== 최종 스택뷰 화면에 추가 =====
+        // ===== 스택뷰, 라벨 화면에 추가 =====
+        [stackView, dedicationTitleLabel, dedicationLabel, summaryTitleLabel, summaryLabel].forEach { view.addSubview($0) }
     }
     
     // ===== 가로 스택뷰 생성 함수 =====
@@ -128,6 +146,30 @@ class BookDetailViewController: UIViewController {
         horizontalStackView.snp.makeConstraints {
             $0.leading.equalTo(stackView.snp.leading).inset(10)
         }
+        
+        // ===== LV 3. Dedication 오토레이아웃 설정 =====
+        dedicationTitleLabel.snp.makeConstraints {
+            $0.top.equalTo(stackView.snp.bottom).offset(24)
+            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
+        }
+        
+        dedicationLabel.snp.makeConstraints {
+            $0.top.equalTo(dedicationTitleLabel.snp.bottom).offset(8)
+            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
+        }
+        
+        summaryTitleLabel.snp.makeConstraints {
+            $0.top.equalTo(dedicationLabel.snp.bottom).offset(24)
+            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
+        }
+        
+        summaryLabel.snp.makeConstraints {
+            $0.top.equalTo(summaryTitleLabel.snp.bottom).offset(8)
+            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
+        }
+        
+        
+        // ===== LV 3. Summary 오토레이아웃 설정 =====
     }
 
     func configureData() {
@@ -139,6 +181,10 @@ class BookDetailViewController: UIViewController {
         authorLabel.text = book.author
         releaseDateLabel.text = formatDate(book.release_date)
         pagesLabel.text = "\(book.pages)"
+        
+        // ===== LV 3. 데이터 출력 =====
+        dedicationLabel.text = book.dedication
+        summaryLabel.text = book.summary
     }
 
     func formatDate(_ date: String) -> String {

@@ -10,12 +10,16 @@ struct Book: Decodable {
     let author: String
     let pages: Int
     let release_date: String
+    let dedication: String
+    let summary: String
     
     enum CodingKeys: String, CodingKey {
         case title
         case author
         case pages
         case release_date = "release_date" // JSON 키 매핑
+        case dedication
+        case summary
     }
 }
 
