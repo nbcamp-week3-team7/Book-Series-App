@@ -69,14 +69,14 @@ class BookDetailViewController: UIViewController {
         configureValueLabel(releaseDateLabel, fontSize: 14, textColor: .gray)
         configureValueLabel(pagesLabel, fontSize: 14, textColor: .gray)
         configureValueLabel(dedicationLabel, fontSize: 14, textColor: .darkGray)
-        configureValueLabel(summaryLabel, fontSize: 14, textColor: .darkGray)
+        configureValueLabel(summaryLabel, fontSize: 16, textColor: .darkGray)
         
         // ===== 밸류 라벨 추가 설정 =====
         authorLabel.font = .boldSystemFont(ofSize: 18)
         dedicationLabel.numberOfLines = 0
         dedicationLabel.lineBreakMode = .byWordWrapping
         summaryLabel.numberOfLines = 0
-        summaryLabel.lineBreakMode = .byTruncatingHead
+        summaryLabel.lineBreakMode = .byWordWrapping
         
         // ===== StackView 기본 속성 설정 =====
         stackView.axis = .vertical
