@@ -261,8 +261,8 @@ class ViewController: UIViewController {
         
         bookInfoStackView.snp.makeConstraints {
             $0.top.equalTo(contentStackView.snp.top)
-            $0.leading.equalToSuperview().offset(8)
-            $0.trailing.equalToSuperview().offset(-8)
+            $0.leading.equalToSuperview().offset(20)
+            $0.trailing.equalToSuperview().offset(-20)
         }
         
         bookImageView.snp.makeConstraints {
@@ -272,18 +272,20 @@ class ViewController: UIViewController {
         
         dedicationStackView.snp.makeConstraints {
             $0.top.equalTo(bookInfoStackView.snp.bottom).offset(24)
-            $0.leading.equalToSuperview().offset(8)
-            $0.trailing.equalToSuperview().offset(-8)
+            $0.leading.equalToSuperview().offset(20)
+            $0.trailing.equalToSuperview().offset(-20)
         }
         
         summaryStackView.snp.makeConstraints {
             $0.top.equalTo(dedicationStackView.snp.bottom).offset(24)
-            $0.leading.equalToSuperview().offset(8)
-            $0.trailing.equalToSuperview().offset(-8)
+            $0.leading.equalToSuperview().offset(20)
+            $0.trailing.equalToSuperview().offset(-20)
         }
         
         chapterStackView.snp.makeConstraints {
             $0.top.equalTo(summaryStackView.snp.bottom).offset(24)
+            $0.leading.equalToSuperview().offset(20)
+            $0.trailing.equalToSuperview().offset(-20)
         }
     }
     
