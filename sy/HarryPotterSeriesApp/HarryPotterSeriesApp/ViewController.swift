@@ -143,7 +143,7 @@ class ViewController: UIViewController {
     let dedicationContentLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14)
-        label.textColor = .gray
+        label.textColor = .darkGray
         label.numberOfLines = 0
         return label
     }()
@@ -164,7 +164,7 @@ class ViewController: UIViewController {
     let summaryContentLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14)
-        label.textColor = .gray
+        label.textColor = .darkGray
         label.numberOfLines = 0
         return label
     }()
@@ -318,7 +318,7 @@ class ViewController: UIViewController {
         selectedBook.chapters.forEach {
             let label = UILabel()
             label.font = .systemFont(ofSize: 14)
-            label.textColor = .gray
+            label.textColor = .darkGray
             label.numberOfLines = 0
             label.text = $0.title
             
