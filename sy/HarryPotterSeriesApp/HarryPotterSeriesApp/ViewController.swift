@@ -219,6 +219,9 @@ class ViewController: UIViewController {
                 self.books = books
             case .failure(let error):
                 print(error)
+                let alert = UIAlertController(title: "데이터 로드 실패", message: "데이터 로드 실패", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "확인", style: .default))
+                self.present(alert, animated: true)
             }
         }
     }
