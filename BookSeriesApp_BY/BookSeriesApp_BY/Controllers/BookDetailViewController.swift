@@ -177,7 +177,7 @@ class BookDetailViewController: UIViewController {
         summaryToggleButton.snp.makeConstraints {
             $0.width.equalTo(70)
             $0.height.equalTo(30)
-            $0.trailing.equalTo(view.safeAreaLayoutGuide).offset(-20) // 오른쪽 벽과 붙게 설정
+            $0.trailing.equalTo(view.safeAreaLayoutGuide).offset(5) // 오른쪽 벽과 붙게 설정
             $0.top.equalTo(summaryLabel.snp.bottom).offset(8) // Summary 라벨 아래에 배치
         }
         
