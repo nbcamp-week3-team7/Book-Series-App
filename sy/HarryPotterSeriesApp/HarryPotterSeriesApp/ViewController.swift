@@ -347,6 +347,9 @@ class ViewController: UIViewController {
                 summaryContentLabel.lineBreakMode = .byTruncatingTail
                 readMoreToggleButton.setTitle("더 보기", for: .normal)
             }
+        } else {
+            summaryContentLabel.numberOfLines = 0
+            readMoreToggleButton.removeFromSuperview()
         }
     }
     
@@ -431,6 +434,7 @@ class ViewController: UIViewController {
         
         chapterStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
+        updateLabelWithReadMore()
         addChapters(unwrappedSelectedBook)
     }
     
