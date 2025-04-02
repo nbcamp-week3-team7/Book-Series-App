@@ -232,6 +232,7 @@ class ViewController: UIViewController {
         
         addSeriesButtons()
         
+        scrollView.showsVerticalScrollIndicator = false
         scrollView.addSubview(contentStackView)
         
         [bookInfoStackView, dedicationStackView, summaryStackView, chapterStackView]
