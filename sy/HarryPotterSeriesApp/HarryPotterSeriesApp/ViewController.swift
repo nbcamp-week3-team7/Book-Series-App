@@ -422,7 +422,7 @@ class ViewController: UIViewController {
         guard let unwrappedSelectedBook = selectedBook else { return }
         
         mainTitleLabel.text = unwrappedSelectedBook.title
-        bookImageView.image = #imageLiteral(resourceName: "harrypotter1")
+        bookImageView.image = UIImage(named: "harrypotter\(currentSeriesNum)")
         titleLabel.text = unwrappedSelectedBook.title
         authorTitleLabel.text = "Author"
         authorValueLabel.text = unwrappedSelectedBook.author
