@@ -417,7 +417,7 @@ class ViewController: UIViewController {
         authorTitleLabel.text = "Author"
         authorValueLabel.text = unwrappedSelectedBook.author
         publishDateTitleLabel.text = "Released"
-        publishDateValueLabel.text = unwrappedSelectedBook.releaseDate
+        publishDateValueLabel.text = formatDate(unwrappedSelectedBook.releaseDate)
         pageCountTitleLabel.text = "Pages"
         pageCountValueLabel.text = "\(unwrappedSelectedBook.pages)"
         dedicationTitleLabel.text = "Dedication"
@@ -429,6 +429,18 @@ class ViewController: UIViewController {
         chapterStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
         addChapters(unwrappedSelectedBook)
+    }
+    
+    func formatDate(_ inputDate: String) -> String {
+        let inputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "yyyy-MM-dd"
+        
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "MMMM d, yyyy"
+        
+        guard let date = inputFormatter.date(from: inputDate) else { return inputDate }
+        
+        return outputFormatter.string(from: date)
     }
 }
 
