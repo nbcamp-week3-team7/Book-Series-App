@@ -10,7 +10,7 @@ import SnapKit
 
 class ViewController: UIViewController {
     private let dataService = DataService()
-    var books = Array<Book>()
+    private var books = Array<Book>()
     
     let mainTitleLabel: UILabel = {
         let label = UILabel()
@@ -197,11 +197,12 @@ class ViewController: UIViewController {
     
     private var prevTitleNum: Int?
     
+    private var selectedSeriesNum = 1
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         
-        isExpanded = UserDefaults.standard.bool(forKey: "isExpanded")
         prevTitleNum = 1
         
         loadBooks()
@@ -223,9 +224,9 @@ class ViewController: UIViewController {
     }
     
     func configureUI() {
-        updateBookDetailView()
+        updateBookDetailView(selectedSeriesNum)
         setupbookInfoStackView()
-        updateLabelWithReadMore()
+        updateLabelWithReadMore(selectedSeriesNum)
         
         [mainTitleLabel, buttonStackView, scrollView]
             .forEach { view.addSubview($0) }
@@ -333,11 +334,13 @@ class ViewController: UIViewController {
         }
     }
     
-    func updateLabelWithReadMore() {
+    func updateLabelWithReadMore(_ currentSeriesNum: Int) {
         guard let count = summaryContentLabel.text?.count else { return }
         if count >= 450 {
             readMoreToggleButton.addTarget(self, action: #selector(toggleSummaryText), for: .touchUpInside)
             summaryStackView.addArrangedSubview(readMoreToggleButton)
+            
+            isExpanded = UserDefaults.standard.bool(forKey: "isExpanded_\(currentSeriesNum)")
             
             if isExpanded {
                 summaryContentLabel.numberOfLines = 0
@@ -364,7 +367,7 @@ class ViewController: UIViewController {
             readMoreToggleButton.setTitle("더 보기", for: .normal)
         }
         
-        UserDefaults.standard.set(isExpanded, forKey: "isExpanded")
+        UserDefaults.standard.set(isExpanded, forKey: "isExpanded_\(selectedSeriesNum)")
     }
     
     func addSeriesButtons() {
@@ -398,6 +401,7 @@ class ViewController: UIViewController {
         if titleNum == prevTitleNum {
             return
         }
+        selectedSeriesNum = titleNum
         
         selectedBook = books[titleNum - 1]
         
@@ -411,10 +415,10 @@ class ViewController: UIViewController {
         }
         
         prevTitleNum = titleNum
-        updateBookDetailView()
+        updateBookDetailView(titleNum)
     }
     
-    func updateBookDetailView() {
+    func updateBookDetailView(_ currentSeriesNum: Int) {
         guard let unwrappedSelectedBook = selectedBook else { return }
         
         mainTitleLabel.text = unwrappedSelectedBook.title
@@ -434,7 +438,7 @@ class ViewController: UIViewController {
         
         chapterStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
-        updateLabelWithReadMore()
+        updateLabelWithReadMore(currentSeriesNum)
         addChapters(unwrappedSelectedBook)
     }
     
