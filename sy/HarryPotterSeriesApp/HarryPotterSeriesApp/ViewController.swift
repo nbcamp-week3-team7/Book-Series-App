@@ -24,7 +24,8 @@ class ViewController: UIViewController {
         let sv = UIStackView()
         sv.axis = .horizontal
         sv.spacing = 8
-        sv.distribution = .equalSpacing
+        sv.alignment = .center
+        sv.distribution = .equalCentering
         return sv
     }()
     
@@ -34,6 +35,8 @@ class ViewController: UIViewController {
         let sv = UIStackView()
         sv.axis = .vertical
         sv.spacing = 24
+        sv.distribution = .fill
+        sv.alignment = .fill
         return sv
     }()
     
@@ -56,7 +59,6 @@ class ViewController: UIViewController {
         sv.axis = .vertical
         sv.spacing = 8
         sv.alignment = .leading
-        sv.distribution = .fill
         return sv
     }()
     
@@ -244,30 +246,29 @@ class ViewController: UIViewController {
         
         mainTitleLabel.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).offset(10)
-            $0.leading.equalToSuperview().offset(20)
-            $0.trailing.equalToSuperview().offset(-20)
+            $0.leading.equalTo(view.safeAreaLayoutGuide).offset(20)
+            $0.trailing.equalTo(view.safeAreaLayoutGuide).offset(-20)
         }
         
         buttonStackView.snp.makeConstraints {
             $0.top.equalTo(mainTitleLabel.snp.bottom).offset(16)
-            $0.leading.equalToSuperview().offset(20)
-            $0.trailing.equalToSuperview().offset(-20)
+            $0.centerX.equalToSuperview()
         }
         
         scrollView.snp.makeConstraints {
             $0.top.equalTo(buttonStackView.snp.bottom).offset(16)
-            $0.leading.trailing.bottom.equalToSuperview()
+            $0.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
         }
         
         contentStackView.snp.makeConstraints {
             $0.edges.equalTo(scrollView.contentLayoutGuide)
             $0.width.equalTo(scrollView.frameLayoutGuide)
         }
+        contentStackView.isLayoutMarginsRelativeArrangement = true
+        contentStackView.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         
         bookInfoStackView.snp.makeConstraints {
             $0.top.equalTo(contentStackView.snp.top)
-            $0.leading.equalToSuperview().offset(20)
-            $0.trailing.equalToSuperview().offset(-20)
         }
         
         bookImageView.snp.makeConstraints {
@@ -277,20 +278,14 @@ class ViewController: UIViewController {
         
         dedicationStackView.snp.makeConstraints {
             $0.top.equalTo(bookInfoStackView.snp.bottom).offset(24)
-            $0.leading.equalToSuperview().offset(20)
-            $0.trailing.equalToSuperview().offset(-20)
         }
         
         summaryStackView.snp.makeConstraints {
             $0.top.equalTo(dedicationStackView.snp.bottom).offset(24)
-            $0.leading.equalToSuperview().offset(20)
-            $0.trailing.equalToSuperview().offset(-20)
         }
         
         chapterStackView.snp.makeConstraints {
             $0.top.equalTo(summaryStackView.snp.bottom).offset(24)
-            $0.leading.equalToSuperview().offset(20)
-            $0.trailing.equalToSuperview().offset(-20)
         }
     }
     
