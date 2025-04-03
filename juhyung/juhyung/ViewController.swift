@@ -10,22 +10,25 @@ import SnapKit
 
 class ViewController: UIViewController {
     
+    let seriesButtonView = SeriesButtonView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
         loadBooks()
+        seriesButtonView.delegate = self
+        
         
     }
     
     private let dataService = DataService()
     private var books: [Book] = []
+    private var BookResponse: BookResponse?
     
     let containerView = UIView()
     let titleLabel = UILabel()
-    let seriesSelectButton = UIButton()
-//    let seriesOrderView = UIView()
-//    let seriesNumber = UILabel()
+    
+    
     let inventoryView = UIView()
     
     let bookCoverImageView = UIImageView()
@@ -54,11 +57,42 @@ class ViewController: UIViewController {
     let chapterDetailLabel = UILabel()
     
     let extraTextClickButton = UIButton(type: .system)
-    private var isExpanded = false {
+    var additionalLines = false {
         didSet {
-            UserDefaults.standard.set(isExpanded, forKey: "isExpanded")
+            UserDefaults.standard.set(additionalLines, forKey: "additionalLines")
         }
     }
+    
+    //delegate를 사용하지 않으려고 했던 흔적
+    /*func makeButtonArray() {
+     
+     for (index, button) in seriresButton.enumerated(){
+     let button = UIButton(type: .system)
+     
+     button.setTitle("\(index)", for: .normal)
+     button.buttonStyle()
+     //            item.tag = index
+     
+     }
+     }
+     
+     func loadBooksAttributes() {
+     dataService.loadBooksAttributes { [weak self] result in
+     guard let self = self else { return }
+     
+     DispatchQueue.main.async {
+     switch result {
+     case .success(let BookResponse):
+     self.BookResponse = BookResponse
+     self.makeButtonArray()
+     
+     case .failure(let error):
+     print("\(error)")
+     }
+     }
+     }
+     }*/
+    
     
     func loadBooks() {
         dataService.loadBooks { [weak self] result in
@@ -68,6 +102,7 @@ class ViewController: UIViewController {
                 switch result {
                 case .success(let books):
                     self.books = books
+                    self.seriesButtonView.configureButtons(count: books.count)
                     self.setupSeriresInfomation(at: 0)
                     
                 case .failure(let error):
@@ -77,15 +112,14 @@ class ViewController: UIViewController {
         }
     }
     
-    //지나고 보니 이렇게 할 이유가없었음;;
     private func setupSeriresInfomation(at number: Int) {
         let book = books[number]
-        //        self.bookCoverImage = UIImage(named: "harrypotter\(number)")
         
         titleLabel.text = book.title
         
         bookInfoTitle.text = book.title
-        seriesSelectButton.setTitle("\(number)", for: .normal)
+        //        seriesSelectButton.setTitle("\(number)", for: .normal)
+        
         //key 를 String이 아닌 key 값을 적용하는것 실패 + 8공백 주기 실패
         bookInfoAuthor.attributedText = setupBookInfo(key: "author        ", value: book.author, keySize: (16, .regular), valueSize: 18, keyColor: .black, valueColor: .darkGray)
         bookInfoRealsed.attributedText = setupBookInfo(key: "released        ", value: book.formattedReleased, keySize: (14, .regular) , valueSize: 14, keyColor: .black, valueColor: .gray)
@@ -95,7 +129,7 @@ class ViewController: UIViewController {
         dedicationTitleLabel.text = "Dedication"
         dedicationBodyLabel.text = book.dedication
         summaryTitleLabel.text = "Summary"
-        summaryBodyLabel.text = book.summary + book.summary
+        summaryBodyLabel.text = book.summary
         chapterTitleLabel.text = "Chapters"
         chapterDetailLabel.setupChapterText(from: book.chapters)
         loadState()
@@ -136,28 +170,10 @@ class ViewController: UIViewController {
     }
     
     
-    
-    
-    
-    //이렇게 만들까 했는데 이것보다 그냥 구조자체를 만드는게 맞겠다.
-    //    private func figureFontProperties(label: UILabel, weight: UIFont.Weight , size: CGFloat, color: UIColor) {
-    //
-    //    }
-    
-    //추후에 한번 나누긴해야됨
     private func configureUI() {
         titleLabel.textAlignment = .center
         titleLabel.font = .boldSystemFont(ofSize: 24)
         titleLabel.numberOfLines = 2
-        
-        
-        seriesOrderView.backgroundColor = .systemBlue
-        seriesOrderView.clipsToBounds = true
-        
-        seriesNumber.textAlignment = .center
-        seriesNumber.font = .systemFont(ofSize: 16)
-        seriesNumber.textColor = .black
-        seriesNumber.text = "1"
         
         bookCoverImageView.contentMode = .scaleAspectFit
         
@@ -171,11 +187,6 @@ class ViewController: UIViewController {
         
         bookInfoTitle.numberOfLines = 0
         bookInfoTitle.font = .systemFont(ofSize: 20, weight: .bold)
-        //        bookInfoTitle.font = .systemFont(ofSize: 20, weight: .bold)
-        //        bookInfoTitle.textColor = .black
-        //
-        //        bookInfoAuthor.font = .systemFont(ofSize: 16, weight: .bold)
-        //        bookInfoAuthor.textColor = .black
         
         dedicationStackView.spacing = 8
         dedicationStackView.axis = .vertical
@@ -209,11 +220,6 @@ class ViewController: UIViewController {
         
         
         
-        
-        
-        //        bookInfoArea.backgroundColor = .red
-        //        bookCoverImageView.backgroundColor = .blue
-        //        bookInfoHorizontalStackView.backgroundColor = .yellow
         inventoryView.backgroundColor = .yellow
         scrollView.backgroundColor = .red
         contentView.backgroundColor = .brown
@@ -231,19 +237,14 @@ class ViewController: UIViewController {
         
         
         extraTextClickButton.addTarget(self, action: #selector(toggleSummary), for: .touchDown)
-        extraTextClickButton.contentHorizontalAlignment = .right
-        
-        
+        extraTextClickButton.contentHorizontalAlignment = .right        
         
         
         [bookInfoHorizontalStackView, dedicationStackView, summaryStackView, chapterStackView]
             .forEach { contentView.addSubview( $0 )}
         
-        [titleLabel, seriesSelectButton]
+        [titleLabel, seriesButtonView]
             .forEach { inventoryView.addSubview( $0 )}
-        
-        
-        seriesOrderView.addSubview(seriesNumber)
         
         [bookCoverImageView, bookInfoArea]
             .forEach { bookInfoHorizontalStackView.addArrangedSubview( $0 )}
@@ -279,23 +280,6 @@ class ViewController: UIViewController {
             $0.trailing.equalToSuperview().offset(-20)
         }
         
-        seriesOrderView.snp.makeConstraints{
-            $0.width.equalTo(40)
-            $0.height.equalTo(40)
-            $0.top.equalTo(titleLabel.snp.bottom).offset(16)
-            $0.leading.greaterThanOrEqualToSuperview().offset(20)
-            $0.trailing.lessThanOrEqualToSuperview().offset(-20)
-            $0.bottom.equalToSuperview()
-            $0.centerX.equalToSuperview()
-        }
-        
-        seriesNumber.snp.makeConstraints{
-            $0.centerX.equalToSuperview()
-            $0.centerY.equalToSuperview()
-        }
-        
-        
-        
         bookCoverImageView.snp.makeConstraints{
             $0.width.equalTo(100)
             $0.height.equalTo(bookCoverImageView.snp.width).multipliedBy(1.5)
@@ -324,7 +308,6 @@ class ViewController: UIViewController {
             $0.top.equalTo(dedicationStackView.snp.bottom).offset(24)
             $0.leading.equalToSuperview().offset(20)
             $0.trailing.equalToSuperview().offset(-20)
-            //            $0.bottom.equalToSuperview().offset(-20)
         }
         
         scrollView.snp.makeConstraints {
@@ -346,35 +329,37 @@ class ViewController: UIViewController {
             $0.bottom.equalToSuperview().offset(-20)
         }
         
-        
-        
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        seriesOrderView.layer.cornerRadius = seriesOrderView.bounds.height / 2
+        seriesButtonView.snp.makeConstraints{
+            
+            $0.top.equalTo(titleLabel.snp.bottom).offset(10)
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalToSuperview()
+            
+        }
         
     }
     
     private func updateSummary() {
         guard let text = summaryBodyLabel.text else { return }
-
-            if text.count > 450 {
-                summaryBodyLabel.numberOfLines = isExpanded ? 0 : 5
-                extraTextClickButton.isHidden = false
-                extraTextClickButton.setTitle(isExpanded ? "접기" : "더보기", for: .normal)
-            } else {
-                extraTextClickButton.isHidden = true
-            }
         
+        if text.count >= 450 {
+            
+            summaryBodyLabel.numberOfLines = additionalLines ? 0 : 5
+            extraTextClickButton.isHidden = false
+            extraTextClickButton.setTitle(additionalLines ? "접기" : "더보기", for: .normal)
+            summaryBodyLabel.lineBreakMode = .byTruncatingMiddle
+        } else {
+            
+            extraTextClickButton.isHidden = true
+        }
     }
     
     private func loadState() {
-            isExpanded = UserDefaults.standard.bool(forKey: "isExpanded")
-        }
+        additionalLines = UserDefaults.standard.bool(forKey: "additionalLines")
+    }
     
     @objc private func toggleSummary() {
-        isExpanded.toggle()
+        additionalLines.toggle()
         updateSummary()
     }
 }
@@ -400,8 +385,14 @@ extension UILabel {
             ]
         )
         
-        //            self.numberOfLines = 0
         self.attributedText = attributedStringLineSpacingOnly
+    }
+    
+}
+
+extension ViewController: SeriesButtonDelegate {
+    func didTapSeriesButton(at index: Int) {
+        setupSeriresInfomation(at: index)
     }
 }
 
