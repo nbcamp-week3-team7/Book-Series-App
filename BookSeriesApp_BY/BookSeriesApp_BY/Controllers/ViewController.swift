@@ -157,7 +157,6 @@ class ViewController: UIViewController {
         
         addChild(detailVC)
         view.addSubview(detailVC.view)
-        detailVC.view.translatesAutoresizingMaskIntoConstraints = false
         
         detailVC.view.snp.makeConstraints {
             $0.leading.equalToSuperview().offset(20)
