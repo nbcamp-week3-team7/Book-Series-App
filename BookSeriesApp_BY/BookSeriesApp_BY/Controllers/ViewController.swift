@@ -1,7 +1,3 @@
-//
-//  25.03.28.(금) 작성
-//  ===== LV 1. 책 제목을 표시하는 라벨 설정 =====
-
 import UIKit
 import SnapKit
 
@@ -9,11 +5,18 @@ class ViewController: UIViewController {
     
     var bookTitleLabel = UILabel()
     let bookNumberLabel = UILabel()
+    let numberLabel = UILabel()
     
     private let dataService = DataService()
     
     // ===== 전달받을 책 데이터 =====
     var book: Book?
+    
+    // ===== 전역 스택뷰 선언 =====
+    let stackView = UIStackView()
+    
+    // ===== 버튼 배열 선언 =====
+    var numberButtons: [UIButton] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,7 +55,8 @@ class ViewController: UIViewController {
     private func configureUI() {
         view.backgroundColor = .white
         
-        [bookTitleLabel, bookNumberLabel].forEach { view.addSubview($0) }
+        [bookTitleLabel, stackView].forEach { view.addSubview($0) }
+        NumberLabel()
         
         // ===== LV 1. 책 제목 표시 =====
         bookTitleLabel.textColor = .black
@@ -66,22 +70,67 @@ class ViewController: UIViewController {
             $0.trailing.equalToSuperview().inset(20)
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).inset(10)
         }
+    }
+    
+    // ===== LV 2. 숫자 라벨을 스택뷰로 표시 =====
+    private func NumberLabel() {
+        let totalNumbers = 7 // 라벨 개수
+        let labelSize: CGFloat = 40 // 라벨 크기
         
-        // ===== LV 2. 책 시리즈 넘버 원형 표시 =====
-        bookNumberLabel.text = "1"
-        bookNumberLabel.textAlignment = .center
-        bookNumberLabel.backgroundColor = .systemBlue
-        bookNumberLabel.textColor = .white
-        bookNumberLabel.font = UIFont.systemFont(ofSize: 16)
-        bookNumberLabel.clipsToBounds = true
-        bookNumberLabel.layer.cornerRadius = 20
+        // 스택뷰 설정
+        stackView.axis = .horizontal // 가로 방향
+        stackView.distribution = .equalSpacing // 라벨 간격 동일하게 설정
+        stackView.spacing = 5 // 라벨 간격 설정
+        stackView.alignment = .center // 라벨을 수직 가운데 정렬
         
-        bookNumberLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(180)
-            $0.trailing.equalToSuperview().inset(180)
-            $0.top.equalTo(bookTitleLabel.snp.bottom).offset(16)
-            $0.width.equalTo(40)
-            $0.height.equalTo(40)
+        // 버튼 생성 및 스택뷰에 추가
+        for number in 1...totalNumbers {
+            let button = UIButton()
+            button.setTitle("\(number)", for: .normal)
+            button.titleLabel?.font = .systemFont(ofSize: 16)
+            button.backgroundColor = UIColor.systemGray5 // 초기 배경색
+            button.setTitleColor(.systemBlue, for: .normal) // 초기 텍스트 색상
+            button.layer.cornerRadius = labelSize / 2 // 원형 버튼
+            button.clipsToBounds = true
+            
+            // 클릭 이벤트 추가
+            button.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
+            
+            // 크기 설정
+            button.snp.makeConstraints { make in
+                make.width.height.equalTo(labelSize)
+            }
+            
+            stackView.addArrangedSubview(button) // 스택뷰에 버튼 추가
+            numberButtons.append(button) // 버튼 배열에 추가
+        }
+        
+        // 스택뷰 제약 조건 설정
+        stackView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(40)
+            make.trailing.equalToSuperview().offset(-40)
+            make.top.equalTo(bookTitleLabel.snp.bottom).offset(16)
+            make.height.equalTo(labelSize)
+        }
+    }
+    
+    // ===== 버튼 클릭 이벤트 =====
+    @objc private func buttonTapped(_ sender: UIButton) {
+        updateButtonStates(selectedButton: sender)
+    }
+    
+    // ===== 버튼 상태 업데이트 함수 =====
+    private func updateButtonStates(selectedButton: UIButton) {
+        for button in numberButtons {
+            if button == selectedButton {
+                // 선택된 버튼
+                button.backgroundColor = .systemBlue
+                button.setTitleColor(.white, for: .normal)
+            } else {
+                // 비활성화된 버튼
+                button.backgroundColor = UIColor.systemGray5
+                button.setTitleColor(.systemBlue, for: .normal)
+            }
         }
     }
     
@@ -96,12 +145,14 @@ class ViewController: UIViewController {
         view.addSubview(detailVC.view)
 
         detailVC.view.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            detailVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            detailVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            detailVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            detailVC.view.topAnchor.constraint(equalTo: bookNumberLabel.bottomAnchor)
-        ])
+        
+        // SnapKit을 사용한 제약 조건 설정
+        detailVC.view.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalToSuperview().offset(-20)
+            make.bottom.equalToSuperview()
+            make.top.equalTo(stackView.snp.bottom).offset(20) // 스택뷰 아래에 배치
+        }
 
         detailVC.didMove(toParent: self)
     }
