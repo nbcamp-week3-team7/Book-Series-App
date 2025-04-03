@@ -23,8 +23,9 @@ class ViewController: UIViewController {
     
     let containerView = UIView()
     let titleLabel = UILabel()
-    let seriesOrderView = UIView()
-    let seriesNumber = UILabel()
+    let seriesSelectButton = UIButton()
+//    let seriesOrderView = UIView()
+//    let seriesNumber = UILabel()
     let inventoryView = UIView()
     
     let bookCoverImageView = UIImageView()
@@ -84,6 +85,7 @@ class ViewController: UIViewController {
         titleLabel.text = book.title
         
         bookInfoTitle.text = book.title
+        seriesSelectButton.setTitle("\(number)", for: .normal)
         //key 를 String이 아닌 key 값을 적용하는것 실패 + 8공백 주기 실패
         bookInfoAuthor.attributedText = setupBookInfo(key: "author        ", value: book.author, keySize: (16, .regular), valueSize: 18, keyColor: .black, valueColor: .darkGray)
         bookInfoRealsed.attributedText = setupBookInfo(key: "released        ", value: book.formattedReleased, keySize: (14, .regular) , valueSize: 14, keyColor: .black, valueColor: .gray)
@@ -147,6 +149,7 @@ class ViewController: UIViewController {
         titleLabel.textAlignment = .center
         titleLabel.font = .boldSystemFont(ofSize: 24)
         titleLabel.numberOfLines = 2
+        
         
         seriesOrderView.backgroundColor = .systemBlue
         seriesOrderView.clipsToBounds = true
@@ -236,7 +239,7 @@ class ViewController: UIViewController {
         [bookInfoHorizontalStackView, dedicationStackView, summaryStackView, chapterStackView]
             .forEach { contentView.addSubview( $0 )}
         
-        [titleLabel, seriesOrderView]
+        [titleLabel, seriesSelectButton]
             .forEach { inventoryView.addSubview( $0 )}
         
         
