@@ -43,6 +43,11 @@ class BookDetailViewController: UIViewController {
         setupActions() // 버튼 동작 추가
     }
     
+    func didSelectBook(_ book: Book) {
+            self.book = book
+            configureData() // UI 업데이트
+        }
+    
     // ===== 타이틀 라벨 설정 함수 =====
     func configureTitleLabel(_ label: UILabel, fontSize: CGFloat, textColor: UIColor, text: String) {
         label.font = .boldSystemFont(ofSize: fontSize) // Bold 폰트 사용
@@ -210,16 +215,6 @@ class BookDetailViewController: UIViewController {
         }
     }
     
-    func formatDate(_ dateString: String) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd" // 문자열 형식에 맞게 설정
-        guard let date = formatter.date(from: dateString) else {
-            return "Unknown Date" // 변환 실패 시 기본값 반환
-        }
-        formatter.dateStyle = .medium
-        return formatter.string(from: date)
-    }
-    
     func setupActions() {
         summaryToggleButton.addTarget(self, action: #selector(toggleSummary), for: .touchUpInside)
     }
@@ -233,4 +228,87 @@ class BookDetailViewController: UIViewController {
         summaryLabel.text = isExpanded ? summaryLength : String(summaryLength.prefix(maxLength)) + "..."
         summaryToggleButton.setTitle(isExpanded ? "접기" : "더보기", for: .normal)
     }
+    
+    func formatDate(_ dateString: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd" // 문자열 형식에 맞게 설정
+        guard let date = formatter.date(from: dateString) else {
+            return "Unknown Date" // 변환 실패 시 기본값 반환
+        }
+        formatter.dateStyle = .medium
+        return formatter.string(from: date)
+    }
+    
+    func updateBookDetails(with newBook: Book) {
+            self.book = newBook
+            
+            // Label 업데이트
+            titleLabel.text = newBook.title
+            authorLabel.text = newBook.author
+            releaseDateLabel.text = formatDate(newBook.release_date)
+            pagesLabel.text = "\(newBook.pages)"
+            dedicationLabel.text = newBook.dedication
+            summaryLabel.text = newBook.summary
+        
+        // 이미지 업데이트: 타이틀로 배열에서 이미지 이름 매칭
+        let imageNames: [String: String] = [
+            "Harry Potter and the Philosopher's Stone": "harrypotter1",
+            "Harry Potter and the Chamber of Secrets": "harrypotter2",
+            "Harry Potter and the Prisoner of Azkaban": "harrypotter3",
+            "Harry Potter and the Goblet of Firen": "harrypotter4",
+            "Harry Potter and the Order of the Phoenix": "harrypotter5",
+            "Harry Potter and the Half-Blood Prince": "harrypotter6",
+            "Harry Potter and the Deathly Hallows": "harrypotter7"
+        ]
+        
+        if let imageName = imageNames[newBook.title] {
+            coverImageView.image = UIImage(named: imageName)
+        } else {
+            coverImageView.image = UIImage(named: "defaultImage") // 기본 이미지 설정
+        }
+        
+        // Summary 텍스트 길이에 따라 토글 버튼 설정
+            let summaryLength = newBook.summary
+            if summaryLength.count > maxLength {
+                summaryLabel.text = isExpanded ? summaryLength : String(summaryLength.prefix(maxLength)) + "..."
+                summaryToggleButton.isHidden = false
+                summaryToggleButton.setTitle(isExpanded ? "접기" : "더보기", for: .normal)
+            } else {
+                summaryLabel.text = summaryLength
+                summaryToggleButton.isHidden = true
+            }
+            
+            // 기존 목차 제거
+            for subview in stackView.arrangedSubviews {
+                if subview is UILabel && subview != titleLabel && subview != authorLabel && subview != dedicationLabel && subview != summaryLabel && subview != dedicationTitleLabel && subview != summaryTitleLabel && subview != chaptersTitleLabel {
+                    subview.removeFromSuperview()
+                }
+            }
+            
+            // 목차 제목 추가
+            if !stackView.arrangedSubviews.contains(chaptersTitleLabel) {
+                stackView.addArrangedSubview(chaptersTitleLabel)
+            }
+            
+            // 새로운 목차 추가
+            for chapter in newBook.chapters {
+                let chapterLabel = UILabel()
+                chapterLabel.text = chapter.title
+                chapterLabel.font = .systemFont(ofSize: 14)
+                chapterLabel.textColor = .darkGray
+                chapterLabel.numberOfLines = 0
+                chapterLabel.lineBreakMode = .byWordWrapping
+                
+                stackView.addArrangedSubview(chapterLabel)
+            }
+            
+            // 타이틀들 추가 (중복 방지)
+            if !stackView.arrangedSubviews.contains(dedicationTitleLabel) {
+                stackView.insertArrangedSubview(dedicationTitleLabel, at: stackView.arrangedSubviews.firstIndex(of: dedicationLabel) ?? 0)
+            }
+            
+            if !stackView.arrangedSubviews.contains(summaryTitleLabel) {
+                stackView.insertArrangedSubview(summaryTitleLabel, at: stackView.arrangedSubviews.firstIndex(of: summaryLabel) ?? 0)
+            }
+        }
 }
