@@ -250,6 +250,23 @@ class BookDetailViewController: UIViewController {
             dedicationLabel.text = newBook.dedication
             summaryLabel.text = newBook.summary
         
+        // 이미지 업데이트: 타이틀로 배열에서 이미지 이름 매칭
+        let imageNames: [String: String] = [
+            "Harry Potter and the Philosopher's Stone": "harrypotter1",
+            "Harry Potter and the Chamber of Secrets": "harrypotter2",
+            "Harry Potter and the Prisoner of Azkaban": "harrypotter3",
+            "Harry Potter and the Goblet of Firen": "harrypotter4",
+            "Harry Potter and the Order of the Phoenix": "harrypotter5",
+            "Harry Potter and the Half-Blood Prince": "harrypotter6",
+            "Harry Potter and the Deathly Hallows": "harrypotter7"
+        ]
+        
+        if let imageName = imageNames[newBook.title] {
+            coverImageView.image = UIImage(named: imageName)
+        } else {
+            coverImageView.image = UIImage(named: "defaultImage") // 기본 이미지 설정
+        }
+        
         // Summary 텍스트 길이에 따라 토글 버튼 설정
             let summaryLength = newBook.summary
             if summaryLength.count > maxLength {
