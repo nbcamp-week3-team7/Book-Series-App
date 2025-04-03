@@ -13,6 +13,7 @@ struct Book: Decodable {
     let dedication: String
     let summary: String
     let chapters: [Chapter]
+    let coverImageName: String?
     
     enum CodingKeys: String, CodingKey {
         case title
@@ -22,6 +23,7 @@ struct Book: Decodable {
         case dedication
         case summary
         case chapters
+        case coverImageName
     }
 }
 
