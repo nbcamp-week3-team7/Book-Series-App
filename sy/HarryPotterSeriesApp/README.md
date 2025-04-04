@@ -4,7 +4,15 @@
 각 시리즈별로 책의 표지, 저자, 출간일, 페이지 수, 헌사, 요약, 챕터 목록 등을 볼 수 있으며, 요약은 "더 보기/접기" 기능을 지원합니다.  
 사용자는 시리즈 버튼을 통해 각 시리즈의 책 정보를 탐색할 수 있습니다.
 
-![screenshot](https://via.placeholder.com/800x400?text=Harry+Potter+Series+App)
+<h3>📱 메인 화면</h3>
+<img src="screenshots/Simulator Screenshot - iPhone 16 Pro Max - 2025-04-04 at 10.52.25.png" width="200"/>
+
+<h3>📚 가로모드 화면</h3>
+<img src="screenshots/Simulator Screenshot - iPhone 16 Pro Max - 2025-04-04 at 10.52.45.png" width="400"/>
+
+<h3>📝 요약 더 보기 화면</h3>
+<img src="screenshots/Simulator Screenshot - iPhone 16 Pro Max - 2025-04-04 at 10.53.02.png" width="200"/>
+
 
 <br>
 
