@@ -15,6 +15,7 @@ class ViewController: UIViewController {
     private let bookInfoView = BookInfoView()
     private let dedicationView = DedicationView()
     private let summaryView = SummaryView()
+    private let chapterListView = ChapterListView()
     
     let mainTitleLabel: UILabel = {
         let label = UILabel()
@@ -42,19 +43,6 @@ class ViewController: UIViewController {
         sv.distribution = .fill
         sv.alignment = .fill
         return sv
-    }()
-    
-    let chapterStackView: UIStackView = {
-        let sv = UIStackView()
-        sv.axis = .vertical
-        sv.spacing = 8
-        return sv
-    }()
-    
-    let chapterTitleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 18, weight: .bold)
-        return label
     }()
     
     private var selectedBook: Book?
@@ -94,7 +82,6 @@ class ViewController: UIViewController {
     
     func configureUI() {
         updateBookDetailView(selectedSeriesNum)
-        setupbookInfoStackView()
         
         [mainTitleLabel, buttonStackView, scrollView]
             .forEach { view.addSubview($0) }
@@ -104,7 +91,7 @@ class ViewController: UIViewController {
         scrollView.showsVerticalScrollIndicator = false
         scrollView.addSubview(contentStackView)
         
-        [bookInfoView, dedicationView, summaryView, chapterStackView]
+        [bookInfoView, dedicationView, summaryView, chapterListView]
             .forEach { contentStackView.addArrangedSubview($0) }
         
         mainTitleLabel.snp.makeConstraints {
@@ -142,36 +129,8 @@ class ViewController: UIViewController {
             $0.top.equalTo(dedicationView.snp.bottom).offset(24)
         }
         
-        chapterStackView.snp.makeConstraints {
+        chapterListView.snp.makeConstraints {
             $0.top.equalTo(summaryView.snp.bottom).offset(24)
-        }
-    }
-    
-    func setupbookInfoStackView() {
-        
-        
-        
-        
-        
-    }
-    
-    func addChapters(_ selectedBook: Book) {
-        chapterStackView.addArrangedSubview(chapterTitleLabel)
-        
-        var chapterLabels = Array<UILabel>()
-        
-        selectedBook.chapters.forEach {
-            let label = UILabel()
-            label.font = .systemFont(ofSize: 14)
-            label.textColor = .darkGray
-            label.numberOfLines = 0
-            label.text = $0.title
-            
-            chapterLabels.append(label)
-        }
-        
-        chapterLabels.forEach {
-            chapterStackView.addArrangedSubview($0)
         }
     }
     
@@ -212,7 +171,7 @@ class ViewController: UIViewController {
         
         sender.backgroundColor = .systemBlue
         sender.setTitleColor(.white, for: .normal)
-
+        
         if let prev = prevTitleNum,
            let prevButton = buttonStackView.arrangedSubviews[prev - 1] as? UIButton {
             prevButton.backgroundColor = .systemGray5
@@ -235,14 +194,8 @@ class ViewController: UIViewController {
         let isExpanded = UserDefaults.standard.bool(forKey: "isExpanded_\(currentSeriesNum)")
         summaryView.configure(summary: unwrappedSelectedBook.summary, seriesNum: currentSeriesNum, isExpanded: isExpanded)
         
-        chapterTitleLabel.text = "Chapters"
-        
-        chapterStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        
-        addChapters(unwrappedSelectedBook)
+        chapterListView.configure(chapters: unwrappedSelectedBook.chapters)
     }
-    
-    
 }
 
 extension ViewController: SummaryViewDelegate {
