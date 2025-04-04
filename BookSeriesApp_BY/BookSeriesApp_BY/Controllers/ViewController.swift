@@ -1,3 +1,7 @@
+//
+// 25.04.04.(금) 최종 수정
+// LV 1~7 상단 버튼과 책타이틀 출력, 가로-세로 화면 제어
+
 import UIKit
 import SnapKit
 
@@ -33,7 +37,7 @@ class ViewController: UIViewController {
         return .allButUpsideDown
     }
     
-    // ===== LV 1~6. 데이터로드 =====
+    // ===== LV 1. 데이터로드 =====
     func loadBooks() {
         dataService.loadBooks { [weak self] result in
             guard let self = self else { return }
@@ -111,23 +115,23 @@ class ViewController: UIViewController {
         
         stackView.snp.makeConstraints {
             $0.centerX.equalToSuperview() // LV 7. 스택뷰 중앙 배치로 수정
-            $0.leading.greaterThanOrEqualToSuperview().offset(20) // LV 7.  좌측 여백 최소값 수정
-            $0.trailing.lessThanOrEqualToSuperview().offset(-20) // LV 7.  우측 여백 최소값 수정
+            $0.leading.greaterThanOrEqualToSuperview().offset(20) // LV 7. 좌측 여백 최소값 수정
+            $0.trailing.lessThanOrEqualToSuperview().offset(-20) // LV 7. 우측 여백 최소값 수정
             $0.top.equalTo(bookTitleLabel.snp.bottom).offset(16)
             $0.height.equalTo(labelSize)
         }
     }
-
     
+    // ===== LV 6. 선택된 버튼 번호에 따라 데이터 업데이트 =====
     @objc private func buttonTapped(_ sender: UIButton) {
         updateButtonStates(selectedButton: sender)
         
-        // 선택된 버튼 번호에 따라 데이터 업데이트
         if let buttonTitle = sender.title(for: .normal), let selectedNumber = Int(buttonTitle) {
             updateBookData(for: selectedNumber)
         }
     }
     
+    // ===== LV 6. 버튼 선택 시 색 변경 로직 =====
     private func updateButtonStates(selectedButton: UIButton) {
         for button in numberButtons {
             if button == selectedButton {
@@ -140,6 +144,7 @@ class ViewController: UIViewController {
         }
     }
     
+    // ===== LV 6. 선택된 책 데이터 업데이트 =====
     private func updateBookData(for number: Int) {
         dataService.loadBooks { [weak self] result in
             guard let self = self else { return }
@@ -163,6 +168,7 @@ class ViewController: UIViewController {
         }
     }
     
+    // ===== LV 2. 만들어둔 BDVC 연결 및 제약 설정 =====
     private func addBookDetailViewController() {
         detailVC.book = self.book
         

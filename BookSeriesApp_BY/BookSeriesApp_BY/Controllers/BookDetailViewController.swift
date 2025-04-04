@@ -1,3 +1,7 @@
+//
+// 25.04.03.(목) 최종 수정
+// LV 2~6 책정보 출력 로직,스크롤뷰, 스택뷰, 데이터 업데이트 구현
+
 import UIKit
 import SnapKit
 
@@ -43,24 +47,26 @@ class BookDetailViewController: UIViewController {
         setupActions() // 버튼 동작 추가
     }
     
+    // ===== LV 6. UI 데이터 업데이를 위한 함수 =====
     func didSelectBook(_ book: Book) {
-            self.book = book
-            configureData() // UI 업데이트
-        }
+        self.book = book
+        configureData() // UI 업데이트
+    }
     
-    // ===== 타이틀 라벨 설정 함수 =====
+    // ===== LV 2-3. 타이틀 라벨 설정 함수 =====
     func configureTitleLabel(_ label: UILabel, fontSize: CGFloat, textColor: UIColor, text: String) {
         label.font = .boldSystemFont(ofSize: fontSize) // Bold 폰트 사용
         label.textColor = textColor
         label.text = text
     }
     
-    // ===== 밸류 라벨 설정 함수 =====
+    // ===== LV 2-3. 밸류 라벨 설정 함수 =====
     func configureValueLabel(_ label: UILabel, fontSize: CGFloat, textColor: UIColor) {
         label.font = .systemFont(ofSize: fontSize) // Regular 폰트 사용
         label.textColor = textColor
     }
     
+    // ===== LV 2~4 요소 설정 =====
     func setupUI() {
         // ===== 기본 설정 =====
         view.backgroundColor = .white
@@ -68,10 +74,8 @@ class BookDetailViewController: UIViewController {
         // ===== 스크롤뷰 추가 =====
         scrollView.showsVerticalScrollIndicator = false // 세로 스크롤 바 숨기기
         scrollView.showsHorizontalScrollIndicator = false // 가로 스크롤 바 숨기기
-        view.addSubview(scrollView)
-        
-        // ===== 스크롤뷰 안에 스택뷰 추가 =====
-        scrollView.addSubview(stackView)
+        view.addSubview(scrollView)         //뷰 안에 스크롤뷰 추아
+        scrollView.addSubview(stackView)    //스크롤뷰 안에 스택뷰 추가
         
         titleLabel.textColor = .black
         titleLabel.font = .boldSystemFont(ofSize: 20)
@@ -100,7 +104,7 @@ class BookDetailViewController: UIViewController {
         summaryLabel.numberOfLines = 0
         summaryLabel.lineBreakMode = .byWordWrapping
         
-        // ===== StackView 기본 속성 설정 =====
+        // ===== StackView, 내부 요소 기본 속성 설정 =====
         stackView.axis = .vertical
         stackView.spacing = 8
         stackView.alignment = .leading
@@ -116,7 +120,7 @@ class BookDetailViewController: UIViewController {
         verticalLabelsStackView.spacing = 8
         verticalLabelsStackView.alignment = .leading
         
-        // ===== 세로 스택뷰에 요소 추가 =====
+        // ===== LV 2. 세로 스택뷰에 요소 추가 =====
         verticalLabelsStackView.addArrangedSubview(titleLabel)
         verticalLabelsStackView.addArrangedSubview(createRowStackView(titleLabel: authorTitleLabel, valueLabel: authorLabel))
         verticalLabelsStackView.addArrangedSubview(createRowStackView(titleLabel: releaseTitleLabel, valueLabel: releaseDateLabel))
@@ -147,7 +151,7 @@ class BookDetailViewController: UIViewController {
         scrollView.addSubview(summaryToggleButton) // 버튼을 스크롤뷰에 직접 추가
     }
     
-    // ===== 가로 스택뷰 생성 함수 =====
+    // ===== LV 2. 가로 스택뷰 생성(책정보의 타이틀-밸류 라벨 간격과 연결 설정) 함수 =====
     func createRowStackView(titleLabel: UILabel, valueLabel: UILabel) -> UIStackView {
         let rowStackView = UIStackView()
         rowStackView.axis = .horizontal
@@ -161,6 +165,7 @@ class BookDetailViewController: UIViewController {
         return rowStackView
     }
     
+    // ===== 기본 제약 설정 =====
     func setupLayout() {
         // ===== 이미지뷰 크기 설정 =====
         coverImageView.snp.makeConstraints {
@@ -192,6 +197,7 @@ class BookDetailViewController: UIViewController {
         stackView.setCustomSpacing(60, after: summaryLabel)
     }
     
+    // ===== LV 2,3,5 데이터 연결 받아 초기 화면 구성 =====
     func configureData() {
         guard let book = book else { return }
         
@@ -215,10 +221,12 @@ class BookDetailViewController: UIViewController {
         }
     }
     
+    // ===== LV 5. 토글 버튼의 Target-Action(버튼 안에서 터치) =====
     func setupActions() {
         summaryToggleButton.addTarget(self, action: #selector(toggleSummary), for: .touchUpInside)
     }
     
+    // ===== LV 5. 토글 후 상태 저장 =====
     @objc func toggleSummary() {
         isExpanded.toggle() // 상태 변경
         UserDefaults.standard.set(isExpanded, forKey: "isExpanded") // 상태 저장
@@ -229,6 +237,7 @@ class BookDetailViewController: UIViewController {
         summaryToggleButton.setTitle(isExpanded ? "접기" : "더보기", for: .normal)
     }
     
+    // ===== LV 2. 날짜 데이터 형식 변환 =====
     func formatDate(_ dateString: String) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd" // 문자열 형식에 맞게 설정
@@ -239,16 +248,17 @@ class BookDetailViewController: UIViewController {
         return formatter.string(from: date)
     }
     
+    // ===== LV 6. 버튼 눌리면 다시 받아와서 데이터 업데이트 =====
     func updateBookDetails(with newBook: Book) {
-            self.book = newBook
-            
-            // Label 업데이트
-            titleLabel.text = newBook.title
-            authorLabel.text = newBook.author
-            releaseDateLabel.text = formatDate(newBook.release_date)
-            pagesLabel.text = "\(newBook.pages)"
-            dedicationLabel.text = newBook.dedication
-            summaryLabel.text = newBook.summary
+        self.book = newBook
+        
+        // Label 업데이트
+        titleLabel.text = newBook.title
+        authorLabel.text = newBook.author
+        releaseDateLabel.text = formatDate(newBook.release_date)
+        pagesLabel.text = "\(newBook.pages)"
+        dedicationLabel.text = newBook.dedication
+        summaryLabel.text = newBook.summary
         
         // 이미지 업데이트: 타이틀로 배열에서 이미지 이름 매칭
         let imageNames: [String: String] = [
@@ -268,47 +278,47 @@ class BookDetailViewController: UIViewController {
         }
         
         // Summary 텍스트 길이에 따라 토글 버튼 설정
-            let summaryLength = newBook.summary
-            if summaryLength.count > maxLength {
-                summaryLabel.text = isExpanded ? summaryLength : String(summaryLength.prefix(maxLength)) + "..."
-                summaryToggleButton.isHidden = false
-                summaryToggleButton.setTitle(isExpanded ? "접기" : "더보기", for: .normal)
-            } else {
-                summaryLabel.text = summaryLength
-                summaryToggleButton.isHidden = true
-            }
-            
-            // 기존 목차 제거
-            for subview in stackView.arrangedSubviews {
-                if subview is UILabel && subview != titleLabel && subview != authorLabel && subview != dedicationLabel && subview != summaryLabel && subview != dedicationTitleLabel && subview != summaryTitleLabel && subview != chaptersTitleLabel {
-                    subview.removeFromSuperview()
-                }
-            }
-            
-            // 목차 제목 추가
-            if !stackView.arrangedSubviews.contains(chaptersTitleLabel) {
-                stackView.addArrangedSubview(chaptersTitleLabel)
-            }
-            
-            // 새로운 목차 추가
-            for chapter in newBook.chapters {
-                let chapterLabel = UILabel()
-                chapterLabel.text = chapter.title
-                chapterLabel.font = .systemFont(ofSize: 14)
-                chapterLabel.textColor = .darkGray
-                chapterLabel.numberOfLines = 0
-                chapterLabel.lineBreakMode = .byWordWrapping
-                
-                stackView.addArrangedSubview(chapterLabel)
-            }
-            
-            // 타이틀들 추가 (중복 방지)
-            if !stackView.arrangedSubviews.contains(dedicationTitleLabel) {
-                stackView.insertArrangedSubview(dedicationTitleLabel, at: stackView.arrangedSubviews.firstIndex(of: dedicationLabel) ?? 0)
-            }
-            
-            if !stackView.arrangedSubviews.contains(summaryTitleLabel) {
-                stackView.insertArrangedSubview(summaryTitleLabel, at: stackView.arrangedSubviews.firstIndex(of: summaryLabel) ?? 0)
+        let summaryLength = newBook.summary
+        if summaryLength.count > maxLength {
+            summaryLabel.text = isExpanded ? summaryLength : String(summaryLength.prefix(maxLength)) + "..."
+            summaryToggleButton.isHidden = false
+            summaryToggleButton.setTitle(isExpanded ? "접기" : "더보기", for: .normal)
+        } else {
+            summaryLabel.text = summaryLength
+            summaryToggleButton.isHidden = true
+        }
+        
+        // 기존 목차 제거
+        for subview in stackView.arrangedSubviews {
+            if subview is UILabel && subview != titleLabel && subview != authorLabel && subview != dedicationLabel && subview != summaryLabel && subview != dedicationTitleLabel && subview != summaryTitleLabel && subview != chaptersTitleLabel {
+                subview.removeFromSuperview()
             }
         }
+        
+        // 목차 제목 추가
+        if !stackView.arrangedSubviews.contains(chaptersTitleLabel) {
+            stackView.addArrangedSubview(chaptersTitleLabel)
+        }
+        
+        // 새로운 목차 추가
+        for chapter in newBook.chapters {
+            let chapterLabel = UILabel()
+            chapterLabel.text = chapter.title
+            chapterLabel.font = .systemFont(ofSize: 14)
+            chapterLabel.textColor = .darkGray
+            chapterLabel.numberOfLines = 0
+            chapterLabel.lineBreakMode = .byWordWrapping
+            
+            stackView.addArrangedSubview(chapterLabel)
+        }
+        
+        // 타이틀들 추가 (중복 방지)
+        if !stackView.arrangedSubviews.contains(dedicationTitleLabel) {
+            stackView.insertArrangedSubview(dedicationTitleLabel, at: stackView.arrangedSubviews.firstIndex(of: dedicationLabel) ?? 0)
+        }
+        
+        if !stackView.arrangedSubviews.contains(summaryTitleLabel) {
+            stackView.insertArrangedSubview(summaryTitleLabel, at: stackView.arrangedSubviews.firstIndex(of: summaryLabel) ?? 0)
+        }
+    }
 }
