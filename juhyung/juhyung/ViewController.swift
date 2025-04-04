@@ -15,6 +15,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        loadBooksAttri()
         loadBooks()
         seriesButtonView.delegate = self
         
@@ -63,37 +64,6 @@ class ViewController: UIViewController {
         }
     }
     
-    //delegate를 사용하지 않으려고 했던 흔적
-    /*func makeButtonArray() {
-     
-     for (index, button) in seriresButton.enumerated(){
-     let button = UIButton(type: .system)
-     
-     button.setTitle("\(index)", for: .normal)
-     button.buttonStyle()
-     //            item.tag = index
-     
-     }
-     }
-     
-     func loadBooksAttributes() {
-     dataService.loadBooksAttributes { [weak self] result in
-     guard let self = self else { return }
-     
-     DispatchQueue.main.async {
-     switch result {
-     case .success(let BookResponse):
-     self.BookResponse = BookResponse
-     self.makeButtonArray()
-     
-     case .failure(let error):
-     print("\(error)")
-     }
-     }
-     }
-     }*/
-    
-    
     func loadBooks() {
         dataService.loadBooks { [weak self] result in
             guard let self = self else { return }
@@ -112,8 +82,28 @@ class ViewController: UIViewController {
         }
     }
     
+    func loadBooksAttri() {
+        dataService.loadBooksAttributes { [weak self] result in
+            guard let self = self else { return }
+            
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let books):
+                    self.BookResponse = books
+                    
+                    
+                case .failure(let error):
+                    print("\(error)")
+                }
+            }
+        }
+    }
+    
     private func setupSeriresInfomation(at number: Int) {
         let book = books[number]
+        guard let attri = BookResponse?.data[number].attributes else {
+            return
+        }
         
         titleLabel.text = book.title
         
@@ -121,9 +111,8 @@ class ViewController: UIViewController {
         //        seriesSelectButton.setTitle("\(number)", for: .normal)
         
         //key 를 String이 아닌 key 값을 적용하는것 실패 + 8공백 주기 실패
-        bookInfoAuthor.attributedText = setupBookInfo(key: "author        ", value: book.author, keySize: (16, .regular), valueSize: 18, keyColor: .black, valueColor: .darkGray)
+        bookInfoAuthor.attributedText = setupBookInfo(key: book.author.codingKey.stringValue + "        " , value: book.author, keySize: (16, .regular), valueSize: 18, keyColor: .black, valueColor: .darkGray)
         bookInfoRealsed.attributedText = setupBookInfo(key: "released        ", value: book.formattedReleased, keySize: (14, .regular) , valueSize: 14, keyColor: .black, valueColor: .gray)
-        // String보다는 Any를 채택해도 좋아보임
         bookInfoPages.attributedText = setupBookInfo(key: "pages        ", value: String(book.pages), keySize: (14, .regular), valueSize: 14, keyColor: .black, valueColor: .gray)
         bookCoverImageView.image = UIImage(named: "harrypotter\(number + 1)")
         dedicationTitleLabel.text = "Dedication"
@@ -237,7 +226,7 @@ class ViewController: UIViewController {
         
         
         extraTextClickButton.addTarget(self, action: #selector(toggleSummary), for: .touchDown)
-        extraTextClickButton.contentHorizontalAlignment = .right        
+        extraTextClickButton.contentHorizontalAlignment = .right
         
         
         [bookInfoHorizontalStackView, dedicationStackView, summaryStackView, chapterStackView]
