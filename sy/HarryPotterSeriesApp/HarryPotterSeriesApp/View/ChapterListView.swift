@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 class ChapterListView: UIView {
     private let chapterStackView: UIStackView = {

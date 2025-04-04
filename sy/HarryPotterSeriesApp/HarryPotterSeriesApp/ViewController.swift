@@ -12,6 +12,7 @@ class ViewController: UIViewController {
     private let dataService = DataService()
     private var books = Array<Book>()
     
+    private let seriesButtonView = SeriesButtonView()
     private let bookInfoView = BookInfoView()
     private let dedicationView = DedicationView()
     private let summaryView = SummaryView()
@@ -23,15 +24,6 @@ class ViewController: UIViewController {
         label.font = .systemFont(ofSize: 24, weight: .bold)
         label.numberOfLines = 0
         return label
-    }()
-    
-    let buttonStackView: UIStackView = {
-        let sv = UIStackView()
-        sv.axis = .horizontal
-        sv.spacing = 8
-        sv.alignment = .center
-        sv.distribution = .equalCentering
-        return sv
     }()
     
     let scrollView = UIScrollView()
@@ -61,6 +53,7 @@ class ViewController: UIViewController {
         selectedBook = books[0]
         configureUI()
         
+        seriesButtonView.delegate = self
         summaryView.delegate = self
     }
     
@@ -83,10 +76,8 @@ class ViewController: UIViewController {
     func configureUI() {
         updateBookDetailView(selectedSeriesNum)
         
-        [mainTitleLabel, buttonStackView, scrollView]
+        [mainTitleLabel, seriesButtonView, scrollView]
             .forEach { view.addSubview($0) }
-        
-        addSeriesButtons()
         
         scrollView.showsVerticalScrollIndicator = false
         scrollView.addSubview(contentStackView)
@@ -100,13 +91,13 @@ class ViewController: UIViewController {
             $0.trailing.equalTo(view.safeAreaLayoutGuide).offset(-20)
         }
         
-        buttonStackView.snp.makeConstraints {
+        seriesButtonView.snp.makeConstraints {
             $0.top.equalTo(mainTitleLabel.snp.bottom).offset(16)
             $0.centerX.equalToSuperview()
         }
         
         scrollView.snp.makeConstraints {
-            $0.top.equalTo(buttonStackView.snp.bottom).offset(16)
+            $0.top.equalTo(seriesButtonView.snp.bottom).offset(16)
             $0.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
         }
         
@@ -134,56 +125,10 @@ class ViewController: UIViewController {
         }
     }
     
-    func addSeriesButtons() {
-        for i in 0..<books.count {
-            let button = UIButton()
-            button.setTitle("\(i + 1)", for: .normal)
-            button.contentHorizontalAlignment = .center
-            button.titleLabel?.font = .systemFont(ofSize: 16)
-            if i == 0 {
-                button.setTitleColor(.white, for: .normal)
-                button.backgroundColor = .systemBlue
-            } else {
-                button.setTitleColor(.systemBlue, for: .normal)
-                button.backgroundColor = .systemGray5
-            }
-            button.layer.cornerRadius = 20
-            button.clipsToBounds = true
-            button.addTarget(self, action: #selector(seriesButtonTapped), for: .touchUpInside)
-            button.snp.makeConstraints {
-                $0.width.height.equalTo(40)
-            }
-            
-            buttonStackView.addArrangedSubview(button)
-        }
-    }
-    
-    @objc func seriesButtonTapped(_ sender: UIButton) {
-        guard let title = sender.title(for: .normal),
-              let titleNum = Int(title) else { return }
-        
-        if titleNum == prevTitleNum {
-            return
-        }
-        selectedSeriesNum = titleNum
-        
-        selectedBook = books[titleNum - 1]
-        
-        sender.backgroundColor = .systemBlue
-        sender.setTitleColor(.white, for: .normal)
-        
-        if let prev = prevTitleNum,
-           let prevButton = buttonStackView.arrangedSubviews[prev - 1] as? UIButton {
-            prevButton.backgroundColor = .systemGray5
-            prevButton.setTitleColor(.systemBlue, for: .normal)
-        }
-        
-        prevTitleNum = titleNum
-        updateBookDetailView(titleNum)
-    }
-    
     func updateBookDetailView(_ currentSeriesNum: Int) {
         guard let unwrappedSelectedBook = selectedBook else { return }
+        
+        seriesButtonView.configure(seriesCount: books.count, selectedIndex: currentSeriesNum - 1)
         
         mainTitleLabel.text = unwrappedSelectedBook.title
         
@@ -195,6 +140,17 @@ class ViewController: UIViewController {
         summaryView.configure(summary: unwrappedSelectedBook.summary, seriesNum: currentSeriesNum, isExpanded: isExpanded)
         
         chapterListView.configure(chapters: unwrappedSelectedBook.chapters)
+    }
+}
+
+extension ViewController: SeriesButtonViewDelegate {
+    func seriesButtonTapped(index: Int) {
+        guard index != selectedSeriesNum - 1 else { return }
+        
+        selectedSeriesNum = index + 1
+        selectedBook = books[index]
+        
+        updateBookDetailView(selectedSeriesNum)
     }
 }
 
