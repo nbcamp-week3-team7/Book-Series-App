@@ -76,10 +76,11 @@ class SummaryView: UIView {
         delegate?.summaryViewDidToggle(isExpanded)
     }
     
-    func configure(summary: String, seriesNum: Int) {
+    func configure(summary: String, seriesNum: Int, isExpanded: Bool) {
         summaryTitleLabel.text = "Summary"
         summaryContentLabel.text = summary
         self.seriesNum = seriesNum
+        self.isExpanded = isExpanded
         
         updateLabelWithReadMore(summary)
     }

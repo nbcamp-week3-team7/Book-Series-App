@@ -12,6 +12,7 @@ class ViewController: UIViewController {
     private let dataService = DataService()
     private var books = Array<Book>()
     
+    private let bookInfoView = BookInfoView()
     private let summaryView = SummaryView()
     
     let mainTitleLabel: UILabel = {
@@ -42,95 +43,6 @@ class ViewController: UIViewController {
         return sv
     }()
     
-    let bookInfoStackView: UIStackView = {
-        let sv = UIStackView()
-        sv.axis = .horizontal
-        sv.spacing = 8
-        sv.alignment = .top
-        return sv
-    }()
-    
-    let bookImageView: UIImageView = {
-        let iv = UIImageView()
-        iv.contentMode = .scaleAspectFit
-        return iv
-    }()
-    
-    let bookDetailStackView: UIStackView = {
-        let sv = UIStackView()
-        sv.axis = .vertical
-        sv.spacing = 8
-        sv.alignment = .leading
-        return sv
-    }()
-    
-    let titleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 20, weight: .bold)
-        label.numberOfLines = 0
-        return label
-    }()
-    
-    let authorInfoStackView: UIStackView = {
-        let sv = UIStackView()
-        sv.axis = .horizontal
-        sv.spacing = 8
-        return sv
-    }()
-    
-    let authorTitleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 16, weight: .bold)
-        return label
-    }()
-    
-    let authorValueLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 18)
-        label.textColor = .darkGray
-        return label
-    }()
-    
-    let publishDateInfoStackView: UIStackView = {
-        let sv = UIStackView()
-        sv.axis = .horizontal
-        sv.spacing = 8
-        return sv
-    }()
-    
-    let publishDateTitleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 14, weight: .bold)
-        return label
-    }()
-    
-    let publishDateValueLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 14)
-        label.textColor = .gray
-        return label
-    }()
-    
-    let pageCountInfoStackView: UIStackView = {
-        let sv = UIStackView()
-        sv.axis = .horizontal
-        sv.spacing = 8
-        return sv
-    }()
-    
-    let pageCountTitleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 14, weight: .bold)
-        return label
-    }()
-    
-    let pageCountValueLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 14)
-        label.textColor = .gray
-        return label
-    }()
-    
     let dedicationStackView: UIStackView = {
         let sv = UIStackView()
         sv.axis = .vertical
@@ -152,8 +64,6 @@ class ViewController: UIViewController {
         return label
     }()
     
-    
-    
     let chapterStackView: UIStackView = {
         let sv = UIStackView()
         sv.axis = .vertical
@@ -166,8 +76,6 @@ class ViewController: UIViewController {
         label.font = .systemFont(ofSize: 18, weight: .bold)
         return label
     }()
-    
-    
     
     private var selectedBook: Book?
     
@@ -216,7 +124,7 @@ class ViewController: UIViewController {
         scrollView.showsVerticalScrollIndicator = false
         scrollView.addSubview(contentStackView)
         
-        [bookInfoStackView, dedicationStackView, chapterStackView]
+        [bookInfoView, dedicationStackView, summaryView, chapterStackView]
             .forEach { contentStackView.addArrangedSubview($0) }
         
         mainTitleLabel.snp.makeConstraints {
@@ -242,17 +150,16 @@ class ViewController: UIViewController {
         contentStackView.isLayoutMarginsRelativeArrangement = true
         contentStackView.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         
-        bookInfoStackView.snp.makeConstraints {
+        bookInfoView.snp.makeConstraints {
             $0.top.equalTo(contentStackView.snp.top)
         }
         
-        bookImageView.snp.makeConstraints {
-            $0.width.equalTo(100)
-            $0.height.equalTo(bookImageView.snp.width).multipliedBy(1.5)
+        dedicationStackView.snp.makeConstraints {
+            $0.top.equalTo(bookInfoView.snp.bottom).offset(24)
         }
         
-        dedicationStackView.snp.makeConstraints {
-            $0.top.equalTo(bookInfoStackView.snp.bottom).offset(24)
+        summaryView.snp.makeConstraints {
+            $0.top.equalTo(dedicationStackView.snp.bottom).offset(24)
         }
         
 //        chapterStackView.snp.makeConstraints {
@@ -261,20 +168,7 @@ class ViewController: UIViewController {
     }
     
     func setupbookInfoStackView() {
-        [authorTitleLabel, authorValueLabel]
-            .forEach { authorInfoStackView.addArrangedSubview($0) }
         
-        [publishDateTitleLabel, publishDateValueLabel]
-            .forEach { publishDateInfoStackView.addArrangedSubview($0) }
-        
-        [pageCountTitleLabel, pageCountValueLabel]
-            .forEach { pageCountInfoStackView.addArrangedSubview($0) }
-        
-        [titleLabel, authorInfoStackView, publishDateInfoStackView, pageCountInfoStackView]
-            .forEach { bookDetailStackView.addArrangedSubview($0) }
-        
-        [bookImageView, bookDetailStackView]
-            .forEach { bookInfoStackView.addArrangedSubview($0) }
         
         [dedicationTitleLabel, dedicationContentLabel]
             .forEach { dedicationStackView.addArrangedSubview($0) }
@@ -354,16 +248,14 @@ class ViewController: UIViewController {
         guard let unwrappedSelectedBook = selectedBook else { return }
         
         mainTitleLabel.text = unwrappedSelectedBook.title
-        bookImageView.image = UIImage(named: "harrypotter\(currentSeriesNum)")
-        titleLabel.text = unwrappedSelectedBook.title
-        authorTitleLabel.text = "Author"
-        authorValueLabel.text = unwrappedSelectedBook.author
-        publishDateTitleLabel.text = "Released"
-        publishDateValueLabel.text = formatDate(unwrappedSelectedBook.releaseDate)
-        pageCountTitleLabel.text = "Pages"
-        pageCountValueLabel.text = "\(unwrappedSelectedBook.pages)"
+        
+        bookInfoView.configure(book: unwrappedSelectedBook, currentSeriesNum: currentSeriesNum)
+        
         dedicationTitleLabel.text = "Dedication"
         dedicationContentLabel.text = unwrappedSelectedBook.dedication
+        
+        let isExpanded = UserDefaults.standard.bool(forKey: "isExpanded_\(currentSeriesNum)")
+        summaryView.configure(summary: unwrappedSelectedBook.summary, seriesNum: currentSeriesNum, isExpanded: isExpanded)
         
         chapterTitleLabel.text = "Chapters"
         
@@ -372,17 +264,7 @@ class ViewController: UIViewController {
         addChapters(unwrappedSelectedBook)
     }
     
-    func formatDate(_ inputDate: String) -> String {
-        let inputFormatter = DateFormatter()
-        inputFormatter.dateFormat = "yyyy-MM-dd"
-        
-        let outputFormatter = DateFormatter()
-        outputFormatter.dateFormat = "MMMM d, yyyy"
-        
-        guard let date = inputFormatter.date(from: inputDate) else { return inputDate }
-        
-        return outputFormatter.string(from: date)
-    }
+    
 }
 
 extension ViewController: SummaryViewDelegate {
