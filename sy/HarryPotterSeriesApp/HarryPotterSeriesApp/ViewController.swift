@@ -9,16 +9,8 @@ import UIKit
 import SnapKit
 
 class ViewController: UIViewController {
-    private let dataService = DataService()
-    private var books = Array<Book>()
-    
-    private let seriesButtonView = SeriesButtonView()
-    private let bookInfoView = BookInfoView()
-    private let dedicationView = DedicationView()
-    private let summaryView = SummaryView()
-    private let chapterListView = ChapterListView()
-    
-    let mainTitleLabel: UILabel = {
+    // MARK: - UI Components
+    private let mainTitleLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 24, weight: .bold)
@@ -26,65 +18,59 @@ class ViewController: UIViewController {
         return label
     }()
     
-    let scrollView = UIScrollView()
+    private let seriesButtonView = SeriesButtonView()
     
-    let contentStackView: UIStackView = {
+    private let scrollView: UIScrollView = {
+        let sv = UIScrollView()
+        sv.showsVerticalScrollIndicator = false
+        return sv
+    }()
+    
+    private let contentStackView: UIStackView = {
         let sv = UIStackView()
         sv.axis = .vertical
         sv.spacing = 24
         sv.distribution = .fill
         sv.alignment = .fill
+        sv.isLayoutMarginsRelativeArrangement = true
+        sv.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         return sv
     }()
     
+    private let bookInfoView = BookInfoView()
+    private let dedicationView = DedicationView()
+    private let summaryView = SummaryView()
+    private let chapterListView = ChapterListView()
+    
+    // MARK: - Data
+    private let dataService = DataService()
+    private var books = [Book]()
     private var selectedBook: Book?
-    
-    private var prevTitleNum: Int?
-    
     private var selectedSeriesNum = 1
     
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         
-        prevTitleNum = 1
-        
+        setupViews()
+        setupConstraints()
+        setupDelegates()
         loadBooks()
-        selectedBook = books[0]
-        configureUI()
-        
-        seriesButtonView.delegate = self
-        summaryView.delegate = self
     }
     
-    func loadBooks() {
-        dataService.loadBooks { [weak self] result in
-            guard let self = self else { return }
-            
-            switch result {
-            case .success(let books):
-                self.books = books
-            case .failure(let error):
-                print(error)
-                let alert = UIAlertController(title: "데이터 로드 실패", message: "데이터 로드 실패", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "확인", style: .default))
-                self.present(alert, animated: true)
-            }
-        }
-    }
-    
-    func configureUI() {
-        updateBookDetailView(selectedSeriesNum)
-        
+    // MARK: - Setup
+    private func setupViews() {
         [mainTitleLabel, seriesButtonView, scrollView]
             .forEach { view.addSubview($0) }
         
-        scrollView.showsVerticalScrollIndicator = false
         scrollView.addSubview(contentStackView)
         
         [bookInfoView, dedicationView, summaryView, chapterListView]
             .forEach { contentStackView.addArrangedSubview($0) }
-        
+    }
+    
+    private func setupConstraints() {
         mainTitleLabel.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).offset(10)
             $0.leading.equalTo(view.safeAreaLayoutGuide).offset(20)
@@ -105,8 +91,6 @@ class ViewController: UIViewController {
             $0.edges.equalTo(scrollView.contentLayoutGuide)
             $0.width.equalTo(scrollView.frameLayoutGuide)
         }
-        contentStackView.isLayoutMarginsRelativeArrangement = true
-        contentStackView.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         
         bookInfoView.snp.makeConstraints {
             $0.top.equalTo(contentStackView.snp.top)
@@ -125,12 +109,42 @@ class ViewController: UIViewController {
         }
     }
     
+    private func setupDelegates() {
+        seriesButtonView.delegate = self
+        summaryView.delegate = self
+    }
+    
+    // MARK: - Data Loading
+    func loadBooks() {
+        dataService.loadBooks { [weak self] result in
+            guard let self = self else { return }
+            
+            switch result {
+            case .success(let books):
+                self.books = books
+                self.selectedBook = books[0]
+                self.selectedSeriesNum = 1
+                self.updateBookDetailView(self.selectedSeriesNum)
+                
+            case .failure(let error):
+                let alert = UIAlertController(
+                    title: "데이터 로드 실패",
+                    message: error.localizedDescription,
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: "확인", style: .default))
+                self.present(alert, animated: true)
+            }
+        }
+    }
+    
+    // MARK: - UI Update
     func updateBookDetailView(_ currentSeriesNum: Int) {
         guard let unwrappedSelectedBook = selectedBook else { return }
         
-        seriesButtonView.configure(seriesCount: books.count, selectedIndex: currentSeriesNum - 1)
-        
         mainTitleLabel.text = unwrappedSelectedBook.title
+        
+        seriesButtonView.configure(seriesCount: books.count, selectedIndex: currentSeriesNum - 1)
         
         bookInfoView.configure(book: unwrappedSelectedBook, currentSeriesNum: currentSeriesNum)
         
@@ -143,6 +157,7 @@ class ViewController: UIViewController {
     }
 }
 
+// MARK: - SeriesButtonViewDelegate
 extension ViewController: SeriesButtonViewDelegate {
     func seriesButtonTapped(index: Int) {
         guard index != selectedSeriesNum - 1 else { return }
@@ -154,6 +169,7 @@ extension ViewController: SeriesButtonViewDelegate {
     }
 }
 
+// MARK: - SummaryViewDelegate
 extension ViewController: SummaryViewDelegate {
     func summaryViewDidToggle(_ isExpanded: Bool) {
         UserDefaults.standard.set(isExpanded, forKey: "isExpanded_\(selectedSeriesNum)")
