@@ -13,6 +13,7 @@ class ViewController: UIViewController {
     private var books = Array<Book>()
     
     private let bookInfoView = BookInfoView()
+    private let dedicationView = DedicationView()
     private let summaryView = SummaryView()
     
     let mainTitleLabel: UILabel = {
@@ -41,27 +42,6 @@ class ViewController: UIViewController {
         sv.distribution = .fill
         sv.alignment = .fill
         return sv
-    }()
-    
-    let dedicationStackView: UIStackView = {
-        let sv = UIStackView()
-        sv.axis = .vertical
-        sv.spacing = 8
-        return sv
-    }()
-    
-    let dedicationTitleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 18, weight: .bold)
-        return label
-    }()
-    
-    let dedicationContentLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 14)
-        label.textColor = .darkGray
-        label.numberOfLines = 0
-        return label
     }()
     
     let chapterStackView: UIStackView = {
@@ -124,7 +104,7 @@ class ViewController: UIViewController {
         scrollView.showsVerticalScrollIndicator = false
         scrollView.addSubview(contentStackView)
         
-        [bookInfoView, dedicationStackView, summaryView, chapterStackView]
+        [bookInfoView, dedicationView, summaryView, chapterStackView]
             .forEach { contentStackView.addArrangedSubview($0) }
         
         mainTitleLabel.snp.makeConstraints {
@@ -154,24 +134,23 @@ class ViewController: UIViewController {
             $0.top.equalTo(contentStackView.snp.top)
         }
         
-        dedicationStackView.snp.makeConstraints {
+        dedicationView.snp.makeConstraints {
             $0.top.equalTo(bookInfoView.snp.bottom).offset(24)
         }
         
         summaryView.snp.makeConstraints {
-            $0.top.equalTo(dedicationStackView.snp.bottom).offset(24)
+            $0.top.equalTo(dedicationView.snp.bottom).offset(24)
         }
         
-//        chapterStackView.snp.makeConstraints {
-//            $0.top.equalTo(summaryStackView.snp.bottom).offset(24)
-//        }
+        chapterStackView.snp.makeConstraints {
+            $0.top.equalTo(summaryView.snp.bottom).offset(24)
+        }
     }
     
     func setupbookInfoStackView() {
         
         
-        [dedicationTitleLabel, dedicationContentLabel]
-            .forEach { dedicationStackView.addArrangedSubview($0) }
+        
         
         
     }
@@ -251,8 +230,7 @@ class ViewController: UIViewController {
         
         bookInfoView.configure(book: unwrappedSelectedBook, currentSeriesNum: currentSeriesNum)
         
-        dedicationTitleLabel.text = "Dedication"
-        dedicationContentLabel.text = unwrappedSelectedBook.dedication
+        dedicationView.configure(content: unwrappedSelectedBook.dedication)
         
         let isExpanded = UserDefaults.standard.bool(forKey: "isExpanded_\(currentSeriesNum)")
         summaryView.configure(summary: unwrappedSelectedBook.summary, seriesNum: currentSeriesNum, isExpanded: isExpanded)
