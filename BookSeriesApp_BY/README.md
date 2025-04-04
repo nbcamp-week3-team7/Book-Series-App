@@ -1,3 +1,4 @@
+
 # Book-Series-App Project
 
 이 프로젝트는 **해리포터 시리즈 1~7권**의 책 정보를 볼 수 있는 iOS 애플리케이션입니다. 사용자는 책 목록을 탐색하고, 각 권의 상세 내용을 확인하며, 챕터별 정보를 살펴볼 수 있습니다. Swift와 SnapKit을 활용해 직관적인 UI를 제공하며, JSON 데이터를 기반으로 책 정보를 관리합니다.
@@ -55,6 +56,7 @@
     - SnapKit을 사용하여 UI 구성
     - 챕터별 정보를 리스트 형태로 표시
     - 해리포터 시리즈 각 권에 맞는 커버 이미지를 동적으로 설정
+    - **가로/세로 화면전환**을 지원하여 다양한 화면 크기에서 최적화된 UI 제공
 
 ---
 
@@ -105,6 +107,8 @@
     - 챕터별 제목을 리스트 형태로 제공하여 책의 구조를 쉽게 확인 가능
 - **숫자 버튼을 통한 탐색**
     - 메인 화면에서 숫자 버튼을 클릭하면 해당 번호에 맞는 책의 상세 정보로 이동합니다.
+- **가로/세로 화면전환 지원**
+    - 사용자가 기기를 회전하면 UI가 자동으로 최적화되어 표시됩니다.
 
 ---
 
@@ -113,7 +117,7 @@
 1. **Harry Potter and the Philosopher's Stone**
 2. **Harry Potter and the Chamber of Secrets**
 3. **Harry Potter and the Prisoner of Azkaban**
-4. **Harry Potter and the Goblet of Firen**
+4. **Harry Potter and the Goblet of Fire**
 5. **Harry Potter and the Order of the Phoenix**
 6. **Harry Potter and the Half-Blood Prince**
 7. **Harry Potter and the Deathly Hallows**
@@ -123,3 +127,5 @@
 **숫자 버튼을 클릭하여 해리포터 시리즈를 탐색하고, 상세 정보를 확인하세요!**
 
 Enjoy your magical journey with Harry Potter! 🧙‍♂️📚
+
+
