@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-class ViewController: UIViewController {
+final class ViewController: UIViewController {
     // MARK: - UI Components
     private let mainTitleLabel: UILabel = {
         let label = UILabel()

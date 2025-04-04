@@ -12,7 +12,7 @@ protocol SeriesButtonViewDelegate: AnyObject {
     func seriesButtonTapped(index: Int)
 }
 
-class SeriesButtonView: UIStackView {
+final class SeriesButtonView: UIStackView {
     weak var delegate: SeriesButtonViewDelegate?
     
     private var currentSelectedIndex: Int = 0

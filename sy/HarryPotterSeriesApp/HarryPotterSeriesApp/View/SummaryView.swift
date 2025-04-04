@@ -12,7 +12,7 @@ protocol SummaryViewDelegate: AnyObject {
     func summaryViewDidToggle(_ isExpanded: Bool)
 }
 
-class SummaryView: UIView {
+final class SummaryView: UIView {
     weak var delegate: SummaryViewDelegate?
     
     let summaryStackView: UIStackView = {

@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-class DedicationView: UIView {
+final class DedicationView: UIView {
     private let dedicationStackView: UIStackView = {
         let sv = UIStackView()
         sv.axis = .vertical
