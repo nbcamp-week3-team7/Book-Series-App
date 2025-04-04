@@ -12,6 +12,8 @@ class ViewController: UIViewController {
     private let dataService = DataService()
     private var books = Array<Book>()
     
+    private let summaryView = SummaryView()
+    
     let mainTitleLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
@@ -150,26 +152,7 @@ class ViewController: UIViewController {
         return label
     }()
     
-    let summaryStackView: UIStackView = {
-        let sv = UIStackView()
-        sv.axis = .vertical
-        sv.spacing = 8
-        return sv
-    }()
     
-    let summaryTitleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 18, weight: .bold)
-        return label
-    }()
-    
-    let summaryContentLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 14)
-        label.textColor = .darkGray
-        label.numberOfLines = 0
-        return label
-    }()
     
     let chapterStackView: UIStackView = {
         let sv = UIStackView()
@@ -178,22 +161,13 @@ class ViewController: UIViewController {
         return sv
     }()
     
-    let readMoreToggleButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("더 보기", for: .normal)
-        button.setTitleColor(.link, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 14)
-        button.contentHorizontalAlignment = .right
-        return button
-    }()
-    
     let chapterTitleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 18, weight: .bold)
         return label
     }()
     
-    private var isExpanded: Bool = false
+    
     
     private var selectedBook: Book?
     
@@ -210,6 +184,8 @@ class ViewController: UIViewController {
         loadBooks()
         selectedBook = books[0]
         configureUI()
+        
+        summaryView.delegate = self
     }
     
     func loadBooks() {
@@ -231,7 +207,6 @@ class ViewController: UIViewController {
     func configureUI() {
         updateBookDetailView(selectedSeriesNum)
         setupbookInfoStackView()
-        updateLabelWithReadMore(selectedSeriesNum)
         
         [mainTitleLabel, buttonStackView, scrollView]
             .forEach { view.addSubview($0) }
@@ -241,7 +216,7 @@ class ViewController: UIViewController {
         scrollView.showsVerticalScrollIndicator = false
         scrollView.addSubview(contentStackView)
         
-        [bookInfoStackView, dedicationStackView, summaryStackView, chapterStackView]
+        [bookInfoStackView, dedicationStackView, chapterStackView]
             .forEach { contentStackView.addArrangedSubview($0) }
         
         mainTitleLabel.snp.makeConstraints {
@@ -280,13 +255,9 @@ class ViewController: UIViewController {
             $0.top.equalTo(bookInfoStackView.snp.bottom).offset(24)
         }
         
-        summaryStackView.snp.makeConstraints {
-            $0.top.equalTo(dedicationStackView.snp.bottom).offset(24)
-        }
-        
-        chapterStackView.snp.makeConstraints {
-            $0.top.equalTo(summaryStackView.snp.bottom).offset(24)
-        }
+//        chapterStackView.snp.makeConstraints {
+//            $0.top.equalTo(summaryStackView.snp.bottom).offset(24)
+//        }
     }
     
     func setupbookInfoStackView() {
@@ -308,8 +279,7 @@ class ViewController: UIViewController {
         [dedicationTitleLabel, dedicationContentLabel]
             .forEach { dedicationStackView.addArrangedSubview($0) }
         
-        [summaryTitleLabel, summaryContentLabel]
-            .forEach { summaryStackView.addArrangedSubview($0) }
+        
     }
     
     func addChapters(_ selectedBook: Book) {
@@ -330,42 +300,6 @@ class ViewController: UIViewController {
         chapterLabels.forEach {
             chapterStackView.addArrangedSubview($0)
         }
-    }
-    
-    func updateLabelWithReadMore(_ currentSeriesNum: Int) {
-        guard let count = summaryContentLabel.text?.count else { return }
-        if count >= 450 {
-            readMoreToggleButton.addTarget(self, action: #selector(toggleSummaryText), for: .touchUpInside)
-            summaryStackView.addArrangedSubview(readMoreToggleButton)
-            
-            isExpanded = UserDefaults.standard.bool(forKey: "isExpanded_\(currentSeriesNum)")
-            
-            if isExpanded {
-                summaryContentLabel.numberOfLines = 0
-                readMoreToggleButton.setTitle("접기", for: .normal)
-            } else {
-                summaryContentLabel.numberOfLines = 7
-                summaryContentLabel.lineBreakMode = .byTruncatingTail
-                readMoreToggleButton.setTitle("더 보기", for: .normal)
-            }
-        } else {
-            summaryContentLabel.numberOfLines = 0
-            readMoreToggleButton.removeFromSuperview()
-        }
-    }
-    
-    @objc func toggleSummaryText() {
-        isExpanded.toggle()
-        
-        if isExpanded {
-            summaryContentLabel.numberOfLines = 0
-            readMoreToggleButton.setTitle("접기", for: .normal)
-        } else {
-            summaryContentLabel.numberOfLines = 7
-            readMoreToggleButton.setTitle("더 보기", for: .normal)
-        }
-        
-        UserDefaults.standard.set(isExpanded, forKey: "isExpanded_\(selectedSeriesNum)")
     }
     
     func addSeriesButtons() {
@@ -430,13 +364,11 @@ class ViewController: UIViewController {
         pageCountValueLabel.text = "\(unwrappedSelectedBook.pages)"
         dedicationTitleLabel.text = "Dedication"
         dedicationContentLabel.text = unwrappedSelectedBook.dedication
-        summaryTitleLabel.text = "Summary"
-        summaryContentLabel.text = unwrappedSelectedBook.summary
+        
         chapterTitleLabel.text = "Chapters"
         
         chapterStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
-        updateLabelWithReadMore(currentSeriesNum)
         addChapters(unwrappedSelectedBook)
     }
     
@@ -453,3 +385,8 @@ class ViewController: UIViewController {
     }
 }
 
+extension ViewController: SummaryViewDelegate {
+    func summaryViewDidToggle(_ isExpanded: Bool) {
+        UserDefaults.standard.set(isExpanded, forKey: "isExpanded_\(selectedSeriesNum)")
+    }
+}
